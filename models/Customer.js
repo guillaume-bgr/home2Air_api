@@ -4,38 +4,39 @@ const sequelize = new Sequelize('home2air_api', 'root', '', {
 	dialect: 'mysql'
 });
 class User extends Model {
-}
 
+}
 User.init({
   // Model attributes are defined here
-  id: {
-	type: DataTypes.INTEGER,
-	autoIncrement: true,
-	primaryKey: true,
-	allowNull: false,
-  },
-  firstName: {
-    type: DataTypes.STRING,
-  },
-  lastName: {
-    type: DataTypes.STRING,
-  },
-  email: {
-	type: DataTypes.STRING,
-	allowNull: false,
-  },
-  password: {
-	type: DataTypes.STRING,
-	allowNull: false,
-  },
-  isCompany: {
-	type: DataTypes.BOOLEAN,
-	allowNull: false,
-  },
-  notifications: {
-	type: DataTypes.BOOLEAN,
-  }
+	id: {
+		type: DataTypes.INTEGER,
+		autoIncrement: true,
+		primaryKey: true,
+		allowNull: false,
+	},
+	firstName: {
+		type: DataTypes.STRING,
+	},
+	lastName: {
+		type: DataTypes.STRING,
+	},
+	email: {
+		type: DataTypes.STRING,
+		allowNull: false,
+		unique: true,
+	},
+	password: {
+		type: DataTypes.STRING,
+		allowNull: false,
+	},
+	isCompany: {
+		type: DataTypes.BOOLEAN,
+		allowNull: false,
+	},
+	notifications: {
+		type: DataTypes.BOOLEAN,
+	}
 }, {
-  sequelize, // We need to pass the connection instance
-  modelName: 'Customer' // We need to choose the model name
+	sequelize, // We need to pass the connection instance
+	modelName: 'Customer' // We need to choose the model name
 });

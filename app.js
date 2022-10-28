@@ -8,12 +8,18 @@ const sequelize = new Sequelize('home2air_api', 'root', '', {
 });
 
 async function test() {
-  try {
-  await sequelize.authenticate();
-  console.log('Nous sommes connectés à la base de données');
-  } catch (error) {
-    console.error('Unable to connect to the database:');
-  }
+	try {
+		await sequelize.authenticate();
+		console.log('Nous sommes connectés à la base de données');
+	} catch (error) {
+		console.error('Unable to connect to the database:');
+	}
+	try {
+		await sequelize.sync();
+		console.log('Toutes les tables ont été modifiées');
+		} catch (error) {
+			console.error('Erreur');
+		}
 }
 
 test();

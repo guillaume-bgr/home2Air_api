@@ -3,11 +3,11 @@ const sequelize = new Sequelize('home2air_api', 'root', '', {
     host: 'localhost',
 	dialect: 'mysql'
 });
-class Sensor extends Model {
+class SensorHistory extends Model {
 	
 }
 
-Sensor.init({
+SensorHistory.init({
 	// Model attributes are defined here
 	id: {
 		type: DataTypes.INTEGER,
@@ -15,24 +15,26 @@ Sensor.init({
 		primaryKey: true,
 		allowNull: false,
 	},
-	name: {
-		type: DataTypes.STRING,
+	co: {
+		type: DataTypes.FLOAT,
 	},
-	park_id: {
+	no2: {
+		type: DataTypes.FLOAT,
+	},
+	nh3: {
+		type: DataTypes.FLOAT,
+	},
+    date: {
+		type: DataTypes.DATE,
+	},
+	sensor_id: {
 		type: DataTypes.INTEGER,
 		references: {
-			model: Park,
-			key: 'id',
-		},
-	},
-	customer_id: {
-		type: DataTypes.INTEGER,
-		references: {
-			model: Customer,
+			model: Sensor,
 			key: 'id',
 		},
 	}
 }, {
 	sequelize, // We need to pass the connection instance
-	modelName: 'Sensor' // We need to choose the model name
+	modelName: 'SensorHistory' // We need to choose the model name
 });
