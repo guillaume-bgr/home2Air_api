@@ -1,14 +1,30 @@
 const http = require('http');
-
-const hostname = '127.0.0.1';
-const port = 3000;
-
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World');
+const express = require('express')
+const app = express();
+const { Sequelize } = require('sequelize');
+const sequelize = new Sequelize('home2air_api', 'root', '', {
+        host: 'localhost',
+        dialect: 'mysql'
 });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+async function test() {
+  try {
+  await sequelize.authenticate();
+  console.log('Nous sommes connectés à la base de données');
+  } catch (error) {
+    console.error('Unable to connect to the database:');
+  }
+}
+
+test();
+
+
+app.use(express.static('public'));
+
+app.get('/', (request, response) => {
+  console.log('hey')
+})
+
+app.listen('3000', 'localhost', () => {
+    console.log('server start');
 });
