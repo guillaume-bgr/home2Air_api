@@ -9,6 +9,9 @@ class Customer extends Model {
 			...this.get(), password: undefined
 		}
 	}
+	static associate(models) {
+		Customer.hasMany(models.Order, {foreignKey: 'customer_id'})
+	}
 }
 Customer.init({
   // Model attributes are defined here

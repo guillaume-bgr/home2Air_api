@@ -1,7 +1,5 @@
 'use strict';
 
-const { Customer } = require('../models/Customer');
-
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -30,12 +28,13 @@ module.exports = {
       customer_id: {
         type: Sequelize.INTEGER,
         references: {
-        model: Customer,
+        model: "customers",
         key: 'id',
+        as: 'customer_id'
       },
     }
     }, {
-      timestamps: false
+      timestamps: false,
     }); 
     /**
      * Add altering commands here.

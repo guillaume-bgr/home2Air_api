@@ -3,9 +3,10 @@ const sequelize = new Sequelize('home2air', 'root', '', {
 	host: 'localhost',
 	dialect: 'mysql'
 });
-const Customer = require('../database');
 class Order extends Model {
-	
+	static associate(models) {
+		Order.belongsTo(models.Customer, {foreignKey: 'customer_id'})
+	}
 }
 
 Order.init({
@@ -34,10 +35,10 @@ Order.init({
 	customer_id: {
 		type: DataTypes.INTEGER,
 		references: {
-		model: Customer,
+		model: "customers",
 		key: 'id',
+		}
 	},
-  }
 }, {
 	sequelize, // We need to pass the connection instance
 	modelName: 'Order' // We need to choose the model name
