@@ -1,36 +1,19 @@
-const http = require('http');
 const express = require('express')
+const router = express.Router();
+require('express-group-routes');
 const app = express();
-const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize('home2air_api', 'root', '', {
-        host: 'localhost',
-        dialect: 'mysql'
-});
 
-async function test() {
-	try {
-		await sequelize.authenticate();
-		console.log('Nous sommes connectés à la base de données');
-	} catch (error) {
-		console.error('Unable to connect to the database:');
-	}
-	try {
-		await sequelize.sync();
-		console.log('Toutes les tables ont été modifiées');
-		} catch (error) {
-			console.error('Erreur');
-		}
-}
+// Body parsers
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
 
-test();
-
-
+// Use static routes
 app.use(express.static('public'));
 
-app.get('/', (request, response) => {
-  console.log('hey')
-})
+// Router imports
+require('./routes/customerRouter')(app);
 
+// Server init
 app.listen('3000', 'localhost', () => {
     console.log('server start');
 });
