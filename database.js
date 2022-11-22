@@ -8,7 +8,7 @@ const db = {}
 // Définitions des modèles
 db.sequelize = sequelize
 db.Customer = require('./models/Customer');
-// db.Order = require('./models/Order');
+db.Order = require('./models/Order');
 // db.Park = require('./models/Park')(sequelize)
 // db.Sensor = require('./models/Sensor')(sequelize)
 // db.SensorHistory = require('./models/SensorHistory')(sequelize)
