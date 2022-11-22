@@ -11,7 +11,7 @@ exports.getAllOrders = (req, res) => {
 }
 
 exports.getOrder = async (req, res) => {
-    let orderId = parseInt(req.params.id)
+    let orderId = parseInt(req.params.id)   
 
     // Vérification si le champ id est présent et cohérent
     if (!orderId) {
@@ -32,26 +32,18 @@ exports.getOrder = async (req, res) => {
 }
 
 exports.addOrder = async (req, res) => {
-    const { first_name, last_name, email, password, is_company, notifications } = req.body
+    const { address, city, post_code, is_delivered, customer_id } = req.body
 
     // Validation des données reçues
-    if (!email || !password || !is_company, !notifications) {
+    if (!address || !city || !post_code, !is_delivered, !customer_id) {
         return res.status(400).json({ message: 'Missing Data' })
     }
 
     try {
-        // Vérification si l'utilisateur existe déjà
-        const order = await Order.findOne({ where: { email: email }, raw: true })
-        if (order !== null) {
-            return res.status(409).json({ message: `The order ${email} already exists !` })
-        }
-        const hash = await bcrypt.hash(password, 10);
-
         // Création de l'utilisateur
-        let orderc = await Order.create({...req.body, password: hash})
+        let orderc = await Order.create(req.body)
     
         return res.json({ message: 'Order Created', data: { orderc } })
-
     }catch(err){
         if(err.name == 'SequelizeDatabaseError'){
             res.status(500).json({ message: 'Database Error', error: err })

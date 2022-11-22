@@ -12,6 +12,7 @@ app.use(express.static('public'));
 
 // Router imports
 require('./routes/customerRouter')(app);
+require('./routes/orderRouter')(app);
 
 // Server init
 app.listen('3000', 'localhost', () => {

@@ -5,7 +5,9 @@ const sequelize = new Sequelize('home2air', 'root', '', {
 });
 class Order extends Model {
 	static associate(models) {
-		Order.belongsTo(models.Customer, {foreignKey: 'customer_id'})
+		Order.belongsTo(models.Customer, {
+			foreignKey: 'customer_id',
+	})
 	}
 }
 
@@ -41,8 +43,9 @@ Order.init({
 	},
 }, {
 	sequelize, // We need to pass the connection instance
-	modelName: 'Order' // We need to choose the model name
+	modelName: 'Order', // We need to choose the model name
+	timestamps: false,
 });
 
 
-exports.Order = Order;
+module.exports = Order;

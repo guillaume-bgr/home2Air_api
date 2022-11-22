@@ -10,7 +10,11 @@ class Customer extends Model {
 		}
 	}
 	static associate(models) {
-		Customer.hasMany(models.Order, {foreignKey: 'customer_id'})
+		Customer.hasMany(models.Order, {
+			onDelete: 'NO ACTION',
+			onUPdate: 'NO ACTION',
+			foreignKey: 'customer_id',
+		})
 	}
 }
 Customer.init({

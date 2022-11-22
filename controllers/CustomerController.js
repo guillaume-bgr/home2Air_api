@@ -32,7 +32,7 @@ exports.getCustomer = async (req, res) => {
 }
 
 exports.addCustomer = async (req, res) => {
-    const { first_name, last_name, email, password, is_company, notifications } = req.body
+    const { email, password, is_company, notifications } = req.body
 
     // Validation des données reçues
     if (!email || !password || !is_company, !notifications) {
