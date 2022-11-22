@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = new Sequelize('home2air_api', 'root', '', {
+const sequelize = new Sequelize('home2air', 'root', '', {
     host: 'localhost',
 	dialect: 'mysql'
 });
@@ -21,9 +21,6 @@ Ticket.init({
 	content: {
 		type: DataTypes.STRING,
 	},
-	created_at: {
-		type: DataTypes.DATE,
-	},
 	user_id: {
 		type: DataTypes.INTEGER,
 		references: {
@@ -34,4 +31,6 @@ Ticket.init({
 	}, {
 	sequelize, // We need to pass the connection instance
 	modelName: 'Ticket' // We need to choose the model name
-	});
+});
+
+exports.Ticket = Ticket;

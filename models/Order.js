@@ -1,8 +1,9 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = new Sequelize('home2air_api', 'root', '', {
-    host: 'localhost',
+const sequelize = new Sequelize('home2air', 'root', '', {
+	host: 'localhost',
 	dialect: 'mysql'
 });
+const Customer = require('../database');
 class Order extends Model {
 	
 }
@@ -30,10 +31,10 @@ Order.init({
 	is_delivered: {
 		type: DataTypes.BOOLEAN,
 	},
-	user_id: {
+	customer_id: {
 		type: DataTypes.INTEGER,
 		references: {
-		model: User,
+		model: Customer,
 		key: 'id',
 	},
   }
@@ -41,3 +42,6 @@ Order.init({
 	sequelize, // We need to pass the connection instance
 	modelName: 'Order' // We need to choose the model name
 });
+
+
+exports.Order = Order;

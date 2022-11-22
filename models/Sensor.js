@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = new Sequelize('home2air_api', 'root', '', {
+const sequelize = new Sequelize('home2air', 'root', '', {
     host: 'localhost',
 	dialect: 'mysql'
 });
@@ -36,3 +36,5 @@ Sensor.init({
 	sequelize, // We need to pass the connection instance
 	modelName: 'Sensor' // We need to choose the model name
 });
+
+exports.User = User;
