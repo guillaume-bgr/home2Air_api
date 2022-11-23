@@ -1,33 +1,23 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const sequelize = new Sequelize('home2air', 'root', '', {
-    host: 'localhost',
-	dialect: 'mysql'
-});
-class Park extends Model {
-	
-}
-
-Park.init({
-	// Model attributes are defined here
-	id: {
-		type: DataTypes.INTEGER,
-		autoIncrement: true,
-		primaryKey: true,
-		allowNull: false,
-	},
-	name: {
-		type: DataTypes.STRING,
-	},
-	user_id: {
-		type: DataTypes.INTEGER,
-		references: {
-			model: User,
-			key: 'id',
-		},
-	}
-	}, {
-	sequelize, // We need to pass the connection instance
-	modelName: 'Park' // We need to choose the model name
-});
-
-	exports.Park = Park;
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class Park extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  }
+  Park.init({
+    name: DataTypes.STRING
+  }, {
+    sequelize,
+    modelName: 'Park',
+  });
+  return Park;
+};
