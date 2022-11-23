@@ -26,12 +26,12 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       },
-      user_id: {
+      customer_id: {
         type: Sequelize.INTEGER,
         references: {
-        model: "users",
+        model: "customers",
         key: 'id',
-        as: 'user_id'
+        as: 'customer_id'
         },
       }
     });
