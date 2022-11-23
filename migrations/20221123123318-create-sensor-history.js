@@ -28,7 +28,15 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
+      sensor_id: {
+        type: Sequelize.INTEGER,
+        references: {
+        model: "sensors",
+        key: 'id',
+        as: 'sensors_id'
+        },
+      } 
     });
   },
   async down(queryInterface, Sequelize) {

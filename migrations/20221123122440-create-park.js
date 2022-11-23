@@ -19,6 +19,14 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      company_id: {
+        type: Sequelize.INTEGER,
+        references: {
+        model: "companies",
+        key: 'id',
+        as: 'company_id'
+        },
       }
     });
   },
