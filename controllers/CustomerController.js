@@ -1,13 +1,16 @@
-const DB = require('../database.js');
-const Customer = require('../models/Customer');
+const db = require('./../models/index');
+const Customer = db['Customer'];
 const bcrypt = require('bcrypt');
 
 /**********************************/
 /*** Routage de la ressource Customer */
-exports.getAllCustomers = (req, res) => {
-    Customer.findAll()
-        .then(customers => res.json({ data: customers }))
-        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+exports.getAllCustomers = async (req, res) => {
+    const query = await Customer.findAll({ 
+        include: ['Orders']
+    })
+    console.log(query);
+        // .then(customers => res.json({ data: customers }))
+        // .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
 exports.getCustomer = async (req, res) => {

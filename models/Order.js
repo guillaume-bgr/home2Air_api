@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Order.belongsTo(models.Customer, {
         foreignKey: 'customer_id',
+        as: 'Customer'
       })
     }
   }
@@ -22,7 +23,8 @@ module.exports = (sequelize, DataTypes) => {
     is_delivered: DataTypes.BOOLEAN
   }, {
     sequelize,
-    modelName: 'Order',
+    modelName: 'Orders',
+    freezeTableName: true,
   });
   return Order;
 };

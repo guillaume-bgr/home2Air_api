@@ -31,7 +31,7 @@ module.exports = {
         references: {
         model: "customers",
         key: 'id',
-        as: 'customer_id'
+        as: 'id'
         },
       }
     });

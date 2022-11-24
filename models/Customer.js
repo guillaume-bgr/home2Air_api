@@ -15,15 +15,16 @@ module.exports = (sequelize, DataTypes) => {
       }
     }
     static associate(models) {
-      Customer.hasMany(models.Order, {
-        foreignKey: 'customer_id',
+      Customer.hasMany(models.Orders, {
+        as: 'Orders',
+        foreignKey: 'customer_id'
       })
-      Customer.hasOne(models.Role, {
-        foreignKey: 'role_id',
-      })
-      Customer.hasOne(models.Company, {
-        foreignKey: 'company_id'
-      })
+      // Customer.hasOne(models.Role, {
+      //   foreignKey: 'role_id',
+      // })
+      // Customer.hasOne(models.Company, {
+      //   foreignKey: 'company_id'
+      // })
     }
   }
   Customer.init({
