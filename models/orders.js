@@ -3,25 +3,28 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Ticket extends Model {
+  class Orders extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Role.hasOne(models.Customer, {
-        foreignKey: 'customer_id',
+      Orders.belongsTo(models.Customers, {
+        as: 'customers',
+        foreignKey: 'id'
       })
     }
   }
-  Ticket.init({
-    status: DataTypes.STRING,
-    title: DataTypes.STRING,
-    content: DataTypes.STRING
+  Orders.init({
+    address: DataTypes.STRING,
+    city: DataTypes.STRING,
+    post_code: DataTypes.STRING,
+    is_delivered: DataTypes.BOOLEAN,
+    customers_id: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'Ticket',
+    modelName: 'Orders',
   });
-  return Ticket;
+  return Orders;
 };

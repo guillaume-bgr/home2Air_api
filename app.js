@@ -1,3 +1,4 @@
+const e = require('express');
 const express = require('express')
 const router = express.Router();
 require('express-group-routes');
@@ -13,6 +14,8 @@ app.use(express.static('public'));
 // Router imports
 require('./routes/customerRouter')(app);
 require('./routes/orderRouter')(app);
+require('./routes/companyRouter')(app);
+require('./routes/roleRouter')(app);
 
 // Server init
 app.listen('3000', 'localhost', () => {

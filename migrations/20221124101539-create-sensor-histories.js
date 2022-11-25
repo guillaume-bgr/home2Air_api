@@ -21,6 +21,13 @@ module.exports = {
       date: {
         type: Sequelize.DATE
       },
+      sensors_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Sensors",
+          key: "id"
+        }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -28,15 +35,7 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      },
-      sensor_id: {
-        type: Sequelize.INTEGER,
-        references: {
-        model: "sensors",
-        key: 'id',
-        as: 'sensors_id'
-        },
-      } 
+      }
     });
   },
   async down(queryInterface, Sequelize) {

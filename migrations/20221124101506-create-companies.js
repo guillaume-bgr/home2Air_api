@@ -13,10 +13,13 @@ module.exports = {
         type: Sequelize.STRING
       },
       siret: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
       },
       siren: {
-        type: Sequelize.INTEGER
+        type: Sequelize.STRING
+      },
+      kbis: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -25,7 +28,7 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      } 
+      }
     });
   },
   async down(queryInterface, Sequelize) {

@@ -1,60 +1,57 @@
 const db = require('./../models/index');
-const Customer = db['Customers'];
+const Companies = db['Companies'];
 const bcrypt = require('bcrypt');
 
 /**********************************/
-/*** Routage de la ressource Customer */
-exports.getAllCustomers = (req, res) => {
-    Customer.findAll({
-        includes: ['Orders']
-    })
-        .then(customers => res.json({ data: customers }))
+/*** Routage de la ressource Company */
+exports.getAllCompanies = (req, res) => {
+    Companies.findAll()
+        .then(companies => res.json({ data: companies }))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
-exports.getCustomer = async (req, res) => {
-    let customerId = parseInt(req.params.id)
+exports.getCompany = async (req, res) => {
+    let companyId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
-    if (!customerId) {
+    if (!companyId) {
         return res.json(400).json({ message: 'Missing Parameter' })
     }
 
     try{
         // Récupération de l'utilisateur et vérification
-        let user = await Customer.findOne({ where: { id: customerId }})
-        if (user === null) {
+        let company = await Companies.findOne({ where: { id: companyId }})
+        if (company === null) {
             return res.status(404).json({ message: 'This user does not exist !' })
         }
 
-        return res.json({ data: user })
+        return res.json({ data: company })
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
     }    
 }
 
-exports.addCustomer = async (req, res) => {
-    const { email, password, is_company, notifications } = req.body
-
+exports.addCompany = async (req, res) => {
+    const { name, siret } = req.body
     // Validation des données reçues
-    if (!email || !password || !is_company, !notifications) {
+    if ( !name || !siret ) {
         return res.status(400).json({ message: 'Missing Data' })
     }
 
     try {
-        // Vérification si l'utilisateur existe déjà
-        const user = await Customer.findOne({ where: { email: email }, raw: true })
-        if (user !== null) {
-            return res.status(409).json({ message: `The user ${email} already exists !` })
+        // Vérification si l'entrprise est déjà enregistrée
+        console.log("siret: ",siret);
+        const company = await Companies.findOne({ where: { siret: parseInt(siret) }, raw: true })
+        console.log(company)
+        if (company !== null) {
+            return res.status(409).json({ message: `The siret n° ${siret} is already registered in the database` })
         }
-        const hash = await bcrypt.hash(password, 10);
-
-        // Création de l'utilisateur
-        let userc = await Customer.create({...req.body, password: hash})
+        let companyc = await Companies.create(req.body)
     
-        return res.json({ message: 'Customer Created', data: { userc } })
+        return res.json({ message: 'Company Created', data: { companyc } })
 
     }catch(err){
+        console.log(err)
         if(err.name == 'SequelizeDatabaseError'){
             res.status(500).json({ message: 'Database Error', error: err })
         }
@@ -62,65 +59,66 @@ exports.addCustomer = async (req, res) => {
     }
 }
 
-exports.updateCustomer = async (req, res) => {
-    let customerId = parseInt(req.params.id)
+exports.updateCompany = async (req, res) => {
+    let companyId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
-    if (!customerId) {
+    if (!companyId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
 
     try{
         // Recherche de l'utilisateur et vérification
-        let user = await Customer.findOne({ where: {id: customerId}, raw: true})
+        let user = await Companies.findOne({ where: {id: companyId}, raw: true})
         if(user === null){
-            return res.status(404).json({ message: 'This user does not exist !'})
+            return res.status(404).json({ message: 'This company does not exist !'})
         }
 
         // Mise à jour de l'utilisateur
-        await Customer.update(req.body, { where: {id: customerId}})
-        return res.json({ message: 'Customer Updated'})
+        await Companies.update(req.body, { where: {id: companyId}})
+        return res.json({ message: 'Company Updated'})
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
     }
 }
 
-exports.untrashCustomer =  (req, res) => {
-    let customerId = parseInt(req.params.id)
+exports.untrashCompany =  (req, res) => {
+    let companyId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
-    if (!customerId) {
+    if (!companyId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
     
-    Customer.restore({ where: {id: customerId}})
+    Companies.restore({ where: {id: companyId}})
         .then(() => res.status(204).json({}))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
-exports.trashCustomer = (req, res) => {
-    let customerId = parseInt(req.params.id)
+exports.trashCompany = (req, res) => {
+    let companyId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
-    if (!customerId) {
+    if (!companyId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
 
     // Suppression de l'utilisateur
-    Customer.destroy({ where: {id: customerId}})
+    Companies.destroy({ where: {id: companyId}})
         .then(() => res.status(204).json({}))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
-exports.deleteCustomer =  (req, res) => {
-    let customerId = parseInt(req.params.id)
+exports.deleteCompany =  (req, res) => {
+    let companyId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
-    if (!customerId) {
+    if (!companyId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
+
     // Suppression de l'utilisateur
-    Customer.destroy({ where: {id: customerId}, force: true})
+    Companies.destroy({ where: {id: companyId}, force: true})
         .then(() => res.status(204).json({}))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }

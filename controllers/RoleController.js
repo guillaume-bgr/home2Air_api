@@ -1,37 +1,37 @@
 const DB = require('../database.js');
-const Order = require('../models/orders');
+const Role = require('../models/roles');
 const bcrypt = require('bcrypt');
 
 /**********************************/
-/*** Routage de la ressource Order */
-exports.getAllOrders = (req, res) => {
-    Order.findAll()
-        .then(orders => res.json({ data: orders }))
+/*** Routage de la ressource Role */
+exports.getAllRoles = (req, res) => {
+    Role.findAll()
+        .then(roles => res.json({ data: roles }))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
-exports.getOrder = async (req, res) => {
-    let orderId = parseInt(req.params.id)   
+exports.getRole = async (req, res) => {
+    let roleId = parseInt(req.params.id)   
 
     // Vérification si le champ id est présent et cohérent
-    if (!orderId) {
+    if (!roleId) {
         return res.json(400).json({ message: 'Missing Parameter' })
     }
 
     try{
         // Récupération de l'utilisateur et vérification
-        let order = await Order.findOne({ where: { id: orderId }})
-        if (order === null) {
-            return res.status(404).json({ message: 'This order does not exist !' })
+        let role = await Role.findOne({ where: { id: roleId }})
+        if (role === null) {
+            return res.status(404).json({ message: 'This role does not exist !' })
         }
 
-        return res.json({ data: order })
+        return res.json({ data: role })
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
     }    
 }
 
-exports.addOrder = async (req, res) => {
+exports.addRole = async (req, res) => {
     const { address, city, post_code, is_delivered, customer_id } = req.body
 
     // Validation des données reçues
@@ -41,9 +41,9 @@ exports.addOrder = async (req, res) => {
 
     try {
         // Création de l'utilisateur
-        let orderc = await Order.create(req.body)
+        let rolec = await Role.create(req.body)
     
-        return res.json({ message: 'Order Created', data: { orderc } })
+        return res.json({ message: 'Role Created', data: { rolec } })
     }catch(err){
         if(err.name == 'SequelizeDatabaseError'){
             res.status(500).json({ message: 'Database Error', error: err })
@@ -52,66 +52,66 @@ exports.addOrder = async (req, res) => {
     }
 }
 
-exports.updateOrder = async (req, res) => {
-    let orderId = parseInt(req.params.id)
+exports.updateRole = async (req, res) => {
+    let roleId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
-    if (!orderId) {
+    if (!roleId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
 
     try{
         // Recherche de l'utilisateur et vérification
-        let order = await Order.findOne({ where: {id: orderId}, raw: true})
-        if(order === null){
-            return res.status(404).json({ message: 'This order does not exist !'})
+        let role = await Role.findOne({ where: {id: roleId}, raw: true})
+        if(role === null){
+            return res.status(404).json({ message: 'This role does not exist !'})
         }
 
         // Mise à jour de l'utilisateur
-        await Order.update(req.body, { where: {id: orderId}})
-        return res.json({ message: 'Order Updated'})
+        await Role.update(req.body, { where: {id: roleId}})
+        return res.json({ message: 'Role Updated'})
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
     }
 }
 
-exports.untrashOrder =  (req, res) => {
-    let orderId = parseInt(req.params.id)
+exports.untrashRole =  (req, res) => {
+    let roleId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
-    if (!orderId) {
+    if (!roleId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
     
-    Order.restore({ where: {id: orderId}})
+    Role.restore({ where: {id: roleId}})
         .then(() => res.status(204).json({}))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
-exports.trashOrder = (req, res) => {
-    let orderId = parseInt(req.params.id)
+exports.trashRole = (req, res) => {
+    let roleId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
-    if (!orderId) {
+    if (!roleId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
 
     // Suppression de l'utilisateur
-    Order.destroy({ where: {id: orderId}})
+    Role.destroy({ where: {id: roleId}})
         .then(() => res.status(204).json({}))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
-exports.deleteOrder =  (req, res) => {
-    let orderId = parseInt(req.params.id)
+exports.deleteRole =  (req, res) => {
+    let roleId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
-    if (!orderId) {
+    if (!roleId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
 
     // Suppression de l'utilisateur
-    Order.destroy({ where: {id: orderId}, force: true})
+    Role.destroy({ where: {id: roleId}, force: true})
         .then(() => res.status(204).json({}))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }

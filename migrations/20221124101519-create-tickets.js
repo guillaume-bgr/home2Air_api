@@ -18,6 +18,13 @@ module.exports = {
       content: {
         type: Sequelize.STRING
       },
+      customers_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Customers",
+          key: "id"
+        }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -25,14 +32,6 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      },
-      customer_id: {
-        type: Sequelize.INTEGER,
-        references: {
-        model: "customers",
-        key: 'id',
-        as: 'customer_id'
-        },
       }
     });
   },

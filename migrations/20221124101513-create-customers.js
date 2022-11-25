@@ -21,11 +21,22 @@ module.exports = {
       password: {
         type: Sequelize.STRING
       },
-      token: {
-        type: Sequelize.STRING
-      },
       img: {
         type: Sequelize.STRING
+      },
+      roles_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Roles",
+          key: "id"
+        }
+      },
+      companies_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Companies",
+          key: "id"
+        }
       },
       createdAt: {
         allowNull: false,
@@ -34,22 +45,6 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      },
-      role_id: {
-        type: Sequelize.INTEGER,
-        references: {
-        model: "roles",
-        key: 'id',
-        as: 'role_id'
-        },
-      },
-      company_id: {
-        type: Sequelize.INTEGER,
-        references: {
-        model: "companies",
-        key: 'id',
-        as: 'company_id'
-        },
       }
     });
   },
