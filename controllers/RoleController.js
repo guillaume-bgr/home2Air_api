@@ -1,5 +1,5 @@
-const DB = require('../database.js');
-const Role = require('../models/roles');
+const db = require('./../models/index');
+const Role = db['Roles'];
 const bcrypt = require('bcrypt');
 
 /**********************************/
@@ -32,19 +32,19 @@ exports.getRole = async (req, res) => {
 }
 
 exports.addRole = async (req, res) => {
-    const { address, city, post_code, is_delivered, customer_id } = req.body
+    const { name } = req.body
 
     // Validation des données reçues
-    if (!address || !city || !post_code, !is_delivered, !customer_id) {
-        return res.status(400).json({ message: 'Missing Data' })
+    if ( !name ) {
+        return res.status(400).json({ message: 'Missing Name' })
     }
-
     try {
         // Création de l'utilisateur
         let rolec = await Role.create(req.body)
     
         return res.json({ message: 'Role Created', data: { rolec } })
     }catch(err){
+        console.log(err)
         if(err.name == 'SequelizeDatabaseError'){
             res.status(500).json({ message: 'Database Error', error: err })
         }

@@ -90,7 +90,7 @@ exports.untrashCompany =  (req, res) => {
         return res.status(400).json({ message: 'Missing parameter' })
     }
     
-    Companies.restore({ where: {id: companyId}})
+    Companies.restore({ where: { id: companyId }})
         .then(() => res.status(204).json({}))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }

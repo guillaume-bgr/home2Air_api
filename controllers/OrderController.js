@@ -1,5 +1,5 @@
-const DB = require('../database.js');
-const Order = require('../models/orders');
+const db = require('./../models/index');
+const Order = db['Orders'];
 const bcrypt = require('bcrypt');
 
 /**********************************/

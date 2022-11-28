@@ -22,37 +22,37 @@ exports.getCustomer = async (req, res) => {
 
     try{
         // Récupération de l'utilisateur et vérification
-        let user = await Customer.findOne({ where: { id: customerId }})
-        if (user === null) {
-            return res.status(404).json({ message: 'This user does not exist !' })
+        let customer = await Customer.findOne({ where: { id: customerId }})
+        if (customer === null) {
+            return res.status(404).json({ message: 'This customer does not exist !' })
         }
 
-        return res.json({ data: user })
+        return res.json({ data: customer })
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
     }    
 }
 
 exports.addCustomer = async (req, res) => {
-    const { email, password, is_company, notifications } = req.body
+    const { email, password } = req.body
 
     // Validation des données reçues
-    if (!email || !password || !is_company, !notifications) {
+    if (!email || !password ) {
         return res.status(400).json({ message: 'Missing Data' })
     }
 
     try {
         // Vérification si l'utilisateur existe déjà
-        const user = await Customer.findOne({ where: { email: email }, raw: true })
-        if (user !== null) {
-            return res.status(409).json({ message: `The user ${email} already exists !` })
+        const customer = await Customer.findOne({ where: { email: email }, raw: true })
+        if (customer !== null) {
+            return res.status(409).json({ message: `The customer ${email} already exists !` })
         }
         const hash = await bcrypt.hash(password, 10);
 
         // Création de l'utilisateur
-        let userc = await Customer.create({...req.body, password: hash})
+        let customerc = await Customer.create({...req.body, password: hash})
     
-        return res.json({ message: 'Customer Created', data: { userc } })
+        return res.json({ message: 'Customer Created', data: { customerc } })
 
     }catch(err){
         if(err.name == 'SequelizeDatabaseError'){
@@ -72,9 +72,9 @@ exports.updateCustomer = async (req, res) => {
 
     try{
         // Recherche de l'utilisateur et vérification
-        let user = await Customer.findOne({ where: {id: customerId}, raw: true})
-        if(user === null){
-            return res.status(404).json({ message: 'This user does not exist !'})
+        let customer = await Customer.findOne({ where: {id: customerId}, raw: true})
+        if(customer === null){
+            return res.status(404).json({ message: 'This customer does not exist !'})
         }
 
         // Mise à jour de l'utilisateur
