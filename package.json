@@ -16,5 +16,8 @@
   },
   "scripts": {
     "dev": "nodemon app.js"
+  },
+  "devDependencies": {
+    "@types/sequelize": "^4.28.14"
   }
 }

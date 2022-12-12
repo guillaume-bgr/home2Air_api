@@ -23,7 +23,9 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     img: DataTypes.STRING,
     roles_id: DataTypes.INTEGER,
-    companies_id: DataTypes.INTEGER
+    companies_id: DataTypes.INTEGER,
+    notifications: DataTypes.BOOLEAN,
+    subscriptions_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Customers',
