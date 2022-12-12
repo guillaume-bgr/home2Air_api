@@ -13,7 +13,6 @@ app.use(express.static('public'));
 
 // Router imports
 require('./routes/customerRouter')(app);
-require('./routes/orderRouter')(app);
 require('./routes/companyRouter')(app);
 require('./routes/roleRouter')(app);
 
