@@ -1,6 +1,8 @@
 const db = require('./../models/index');
 const Customer = db['Customers'];
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { log } = require('console');
 
 /**********************************/
 /*** Routage de la ressource Customer */
@@ -111,7 +113,7 @@ exports.trashCustomer = (req, res) => {
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
-exports.deleteCustomer =  (req, res) => {
+exports.deleteCustomer = (req, res) => {
     let customerId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
@@ -122,4 +124,44 @@ exports.deleteCustomer =  (req, res) => {
     Customer.destroy({ where: {id: customerId}, force: true})
         .then(() => res.status(204).json({}))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+}
+
+exports.authenticateCustomer = async (req, res) => {
+    const { id, email, password } = req.body;
+
+    // Validation des données reçues
+    if (!email || !password ) {
+        return res.status(400).json({ message: 'Missing Data' });
+    }
+
+    try {
+        // Vérification si l'utilisateur existe déjà
+        const customer = await Customer.findOne({ where: { email: email }, raw: true })
+        if (customer == null) {
+            return res.status(404).json({ message: `Customer not found.` })
+        }
+        else {
+            hash = customer.password;
+            bcrypt.compare(password, hash, function(err, response) {
+                if (response == true) {
+                    let token = generateJWT({email: email, id: id}, "24h");
+                    let refresh = generateJWT({id: id}, "24h");
+                    return res.status(200).json({ message: 'Authenticated', data: { token, refresh } });
+                }
+              })
+            .catch(err => console.error(err.message));
+        }
+    
+        return res.json({ message: 'Customer Created', data: { customerc } })
+
+    } catch(err) { 
+    //     if(err.name == 'SequelizeDatabaseError'){
+    //         res.status(500).json({ message: 'Database Error', error: err })
+    //     }
+    //     res.status(500).json({ message: 'Hash Process Error', error: err})        
+    }
+}
+
+function generateJWT(payload, expiresIn) {
+    return jwt.sign(payload, 'ApiHome2Air', { expiresIn: expiresIn })
 }
