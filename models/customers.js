@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         as: 'Notifications',
         foreignKey: 'customers_id',
       })
+      Customers.belongsTo(models.Roles, {
+        as: 'Roles',
+        foreignKey: 'roles_id',
+      })
     }
   }
   Customers.init({
