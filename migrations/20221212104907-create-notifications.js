@@ -13,7 +13,7 @@ module.exports = {
       customers_id: {
         type: Sequelize.INTEGER,
         references:{
-          model:"Notifications",
+          model:"Customers",
           key:"id"
         }
       },
