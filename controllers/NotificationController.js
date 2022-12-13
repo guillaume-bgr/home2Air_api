@@ -47,13 +47,6 @@ exports.deleteNotification =  (req, res) => {
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
-
-
-
-
-
-
-
 exports.updateNotification = async (req, res) => {
     let notificationId = parseInt(req.params.id)
 

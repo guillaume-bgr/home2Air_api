@@ -146,6 +146,7 @@ exports.authenticateCustomer = async (req, res) => {
                 if (response == true) {
                     let token = generateJWT({email: email, id: id}, "24h");
                     let refresh = generateJWT({id: id}, "24h");
+                    console.log(refresh)
                     return res.status(200).json({ message: 'Authenticated', data: { token, refresh } });
                 }
               })
