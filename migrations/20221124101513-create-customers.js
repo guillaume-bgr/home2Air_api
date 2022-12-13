@@ -24,6 +24,9 @@ module.exports = {
       img: {
         type: Sequelize.STRING
       },
+      notifications: {
+        type: Sequelize.BOOLEAN
+      },
       roles_id: {
         type: Sequelize.INTEGER,
         references: {

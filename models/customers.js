@@ -21,7 +21,6 @@ module.exports = (sequelize, DataTypes) => {
     roles_id: DataTypes.INTEGER,
     companies_id: DataTypes.INTEGER,
     notifications: DataTypes.BOOLEAN,
-    subscriptions_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Customers',
