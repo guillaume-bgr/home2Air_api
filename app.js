@@ -1,8 +1,8 @@
+require('express-group-routes');
+require('dotenv').config();
 const express = require('express')
 const router = express.Router();
-require('express-group-routes');
 const app = express();
-require('dotenv').config();
 
 // Body parsers
 app.use(express.urlencoded({ extended: true }))
