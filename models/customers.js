@@ -14,6 +14,10 @@ module.exports = (sequelize, DataTypes) => {
         as: 'tickets',
         foreignKey: 'customers_id',
       })
+      Customers.hasMany(models.Notifications,{
+        as:"notifications",
+        foreignKey:'customers_id',
+      })
     }
   }
   Customers.init({

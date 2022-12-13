@@ -1,4 +1,3 @@
-const e = require('express');
 const express = require('express')
 const router = express.Router();
 require('express-group-routes');
@@ -18,6 +17,7 @@ require('./routes/companyRouter')(app);
 require('./routes/roleRouter')(app);
 require('./routes/ticketRouter')(app);
 require('./routes/subscriptionRouter')(app);
+require('./routes/notificationRouter')(app);
 
 // Server init
 app.listen('3000', 'localhost', () => {
