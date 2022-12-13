@@ -41,6 +41,13 @@ module.exports = {
           key: "id"
         }
       },
+      subscriptions_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Subscriptions",
+          key: "id"
+        }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

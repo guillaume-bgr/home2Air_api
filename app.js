@@ -16,6 +16,8 @@ app.use(express.static('public'));
 require('./routes/customerRouter')(app);
 require('./routes/companyRouter')(app);
 require('./routes/roleRouter')(app);
+require('./routes/ticketRouter')(app);
+require('./routes/subscriptionRouter')(app);
 
 // Server init
 app.listen('3000', 'localhost', () => {
