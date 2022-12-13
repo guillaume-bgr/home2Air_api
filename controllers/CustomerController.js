@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 /*** Routage de la ressource Customer */
 exports.getAllCustomers = (req, res) => {
     Customer.findAll({
+        includes: ['Orders']
     })
         .then(customers => res.json({ data: customers }))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
