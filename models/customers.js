@@ -22,6 +22,16 @@ module.exports = (sequelize, DataTypes) => {
         as: 'Roles',
         foreignKey: 'roles_id',
       })
+      Customers.belongsTo(models.Companies, {
+        as: 'Companies',
+        foreignKey: 'companies_id',
+      })
+    }
+
+    toJSON() {
+      return {
+        ...this.get(), password: undefined, roles_id: undefined, companies_id: undefined
+      }
     }
   }
   Customers.init({
