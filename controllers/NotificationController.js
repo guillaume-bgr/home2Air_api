@@ -1,14 +1,19 @@
 const db = require('./../models/index');
-const Notifications = db['Notifications'];
+const Notification = db['Notifications'];
 const bcrypt = require('bcrypt');
 
 /**********************************/
-/*** Routage de la ressource Notifications */
+/*** Routage de la ressource Notification */
 exports.getAllNotifications = (req, res) => {
-    Notifications.findAll({
-    })
-        .then(notifications => res.json({ data: notifications }))
-        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+    if (res.tokenRole == "ADMIN") {
+        Notification.findAll({
+            order: [['createdAt', 'DESC']]
+        })
+            .then(notifications => res.json({ data: notifications }))
+            .catch(err => res.status(500).json({ message: 'Database Error' }))
+    } else {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
 }
 
 exports.getNotification = async (req, res) => {
@@ -20,8 +25,8 @@ exports.getNotification = async (req, res) => {
     }
 
     try{
-        // Récupération de la notification et vérification
-        let notification = await Notifications.findOne({ where: { id: notificationId }})
+        // Récupération de l'utilisateur et vérification
+        let notification = await Notification.findOne({ include: ["Roles", "Companies"], where: { id: notificationId }})
         if (notification === null) {
             return res.status(404).json({ message: 'This notification does not exist !' })
         }
@@ -30,87 +35,89 @@ exports.getNotification = async (req, res) => {
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
     }    
-}
-
-exports.getUserNotifications = async (req, res) => {
-    let notificationId = parseInt(req.params.id)
-
-    // Vérification si le champ id est présent et cohérent
-    if (!notificationId) {
-        return res.json(400).json({ message: 'Missing Parameter' })
-    }
-
-    try{
-        // Récupération de la notification et vérification
-        let notification = await Notifications.findOne({ where: { id: notificationId }})
-        if (notification === null) {
-            return res.status(404).json({ message: 'This notification does not exist !' })
-        }
-
-        return res.json({ data: notification })
-    }catch(err){
-        return res.status(500).json({ message: 'Database Error', error: err })
-    }    
-}
-
-
-
-exports.deleteNotification =  (req, res) => {
-    let notificationId = parseInt(req.params.id)
-
-    // Vérification si le champ id est présent et cohérent
-    if (!notificationId) {
-        return res.status(400).json({ message: 'Missing parameter' })
-    }
-    // Suppression de la notification
-    Notifications.destroy({ where: {id: notificationId}, force: true})
-        .then(() => res.status(204).json({}))
-        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
-}
-
-exports.updateNotification = async (req, res) => {
-    let notificationId = parseInt(req.params.id)
-
-    // Vérification si le champ id est présent et cohérent
-    if (!notificationId) {
-        return res.status(400).json({ message: 'Missing parameter' })
-    }
-
-    try{
-        // Recherche de l'utilisateur et vérification
-        let notification = await Notifications.findOne({ where: {id: notificationId}, raw: true})
-        if(notification === null){
-            return res.status(404).json({ message: 'This notification does not exist !'})
-        }
-
-        // Mise à jour de l'utilisateur
-        await Notifications.update(req.body, { where: {id: notificationId}})
-        return res.json({ message: 'Notifications Updated'})
-    }catch(err){
-        return res.status(500).json({ message: 'Database Error', error: err })
-    }
 }
 
 exports.addNotification = async (req, res) => {
-    const { name, content, customers_id } = req.body
-    
-    
-    // Validation des données reçues
+    const { email, password } = req.body
 
-    if ( !name || !content || !customers_id ) {
+    // Validation des données reçues
+    if (!email || !password ) {
         return res.status(400).json({ message: 'Missing Data' })
     }
-  
+
     try {
-        // Création de la notification
-        let notification = await Notifications.create(req.body)
+        // Vérification si l'utilisateur existe déjà
+        const notification = await Notification.findOne({ where: { email: email }, raw: true })
+        if (notification !== null) {
+            return res.status(409).json({ message: `The notification ${email} already exists !` })
+        }
+        const hash = await bcrypt.hash(password, 10);
+
+        // Création de l'utilisateur
+        let notificationc = await Notification.create({...req.body, password: hash})
     
-        return res.json({ message: 'Notifications created', data: { notification } })
+        return res.json({ message: 'Notification Created', data: { notificationc } })
+
     }catch(err){
-        console.log(err)
-       err.name == 'SequelizeDatabaseError'
+        if(err.name == 'SequelizeDatabaseError'){
             res.status(500).json({ message: 'Database Error', error: err })
-        
-       
+        }
+        res.status(500).json({ message: 'Hash Process Error', error: err})        
+    }
+}
+
+exports.updateNotification = async (req, res) => {
+    let notificationId = parseInt(req.params.id);
+    
+    // Vérification si le champ id est présent et cohérent
+    if (!notificationId) {
+        return res.status(400).json({ message: 'Missing parameter' })
+    }
+
+    // Si le token contient bien un rôle et un token
+    if (!res.tokenRole || !res.tokenId) {
+        return res.status(400).json({ message: 'Missing token' })
+    }
+    
+    if (res.tokenRole == "ADMIN") {
+        try{
+
+            // Recherche de l'utilisateur et vérification
+            let notification = await Notification.findOne({ where: {id: notificationId, user_id: res.tokenId}, raw: true})
+            if(notification === null) {
+                return res.status(404).json({ message: 'This notification does not exist !' })
+            }
+    
+            // Mise à jour de l'utilisateur
+            await Notification.update(req.body, { where: {id: notificationId} })
+            return res.json({ message: 'Notification Updated' })
+        } catch(err){ 
+            return res.status(500).json({ message: 'Database Error', error: err })
+        }
+    } else {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+}
+
+exports.deleteNotification = (req, res) => {
+    let notificationId = parseInt(req.params.id);
+
+    // Vérification si le champ id est présent et cohérent
+    if (!notificationId) {
+        return res.status(400).json({ message: 'Missing parameter' })
+    }
+
+    // Si le token contient bien un rôle et un token
+    if (!res.tokenRole || !res.tokenId) {
+        return res.status(400).json({ message: 'Missing token' })
+    }
+
+    if (res.tokenRole == "ADMIN" || notificationId === res.tokenId) {
+        // Suppression de l'utilisateur
+        Notification.destroy({ where: {id: notificationId}, force: true})
+            .then(() => res.status(200).json({ message: 'Notification deleted' }))
+            .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+    } else {
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 }

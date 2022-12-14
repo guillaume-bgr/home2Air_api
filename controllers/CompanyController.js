@@ -4,7 +4,9 @@ const Company = db['Companies'];
 /**********************************/
 /*** Routage de la ressource Company */
 exports.getAllCompanies = (req, res) => {
-    Company.findAll()
+    Company.findAll({
+        order: [['createdAt', 'DESC']]
+    })
         .then(companies => res.json({ data: companies }))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }

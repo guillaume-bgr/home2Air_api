@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 exports.getAllCustomers = (req, res) => {
     if (res.tokenRole == "ADMIN") {
         Customer.findAll({
+            order: [['createdAt', 'DESC']],
             include: ["Roles", "Companies"]
         })
             .then(customers => res.json({ data: customers }))

@@ -1,4 +1,5 @@
 const CompanyController = require('../controllers/CompanyController');
+const authToken = require('../middleware/authToken');
 module.exports = (app) => {
     app.group("/companies", (router) => {
         router.get("/", CompanyController.getAllCompanies); // FindAll
