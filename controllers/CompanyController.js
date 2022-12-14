@@ -1,16 +1,18 @@
 const db = require('./../models/index');
 const Companies = db['Companies'];
-const bcrypt = require('bcrypt');
 
 /**********************************/
 /*** Routage de la ressource Company */
 exports.getAllCompanies = (req, res) => {
-    Companies.findAll()
-        .then(companies => res.json({ data: companies }))
-        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+    if (res.tokenRole == "ADMIN") {
+        Companies.findAll()
+            .then(companies => res.json({ data: companies }))
+            .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+    }
 }
 
 exports.getCompany = async (req, res) => {
+
     let companyId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
@@ -19,10 +21,10 @@ exports.getCompany = async (req, res) => {
     }
 
     try{
-        // Récupération de l'utilisateur et vérification
+        // Récupération de l'entreprise et vérification
         let company = await Companies.findOne({ where: { id: companyId }})
         if (company === null) {
-            return res.status(404).json({ message: 'This user does not exist !' })
+            return res.status(404).json({ message: 'This company does not exist !' })
         }
 
         return res.json({ data: company })
@@ -33,6 +35,7 @@ exports.getCompany = async (req, res) => {
 
 exports.addCompany = async (req, res) => {
     const { name, siret } = req.body
+
     // Validation des données reçues
     if ( !name || !siret ) {
         return res.status(400).json({ message: 'Missing Data' })
@@ -40,9 +43,7 @@ exports.addCompany = async (req, res) => {
 
     try {
         // Vérification si l'entrprise est déjà enregistrée
-        console.log("siret: ",siret);
         const company = await Companies.findOne({ where: { siret: parseInt(siret) }, raw: true })
-        console.log(company)
         if (company !== null) {
             return res.status(409).json({ message: `The siret n° ${siret} is already registered in the database` })
         }
@@ -51,7 +52,6 @@ exports.addCompany = async (req, res) => {
         return res.json({ message: 'Company Created', data: { companyc } })
 
     }catch(err){
-        console.log(err)
         if(err.name == 'SequelizeDatabaseError'){
             res.status(500).json({ message: 'Database Error', error: err })
         }
@@ -59,7 +59,7 @@ exports.addCompany = async (req, res) => {
     }
 }
 
-exports.updateCompany = async (req, res) => {
+exports.updateCompanyOld = async (req, res) => {
     let companyId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
@@ -79,6 +79,39 @@ exports.updateCompany = async (req, res) => {
         return res.json({ message: 'Company Updated'})
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
+    }
+}
+
+exports.updateCompany = async (req, res) => {
+    let companyId = parseInt(req.params.id)
+    
+    // Vérification si le champ id est présent et cohérent
+    if (!companyId) {
+        return res.status(400).json({ message: 'Missing parameter' })
+    }
+
+    // Si le token contient bien un rôle et un token
+    if (!res.tokenRole || !res.tokenId) {
+        return res.status(400).json({ message: 'Missing token' })
+    }
+    
+    if (res.tokenRole == "ADMIN" || companyId === res.tokenId) {
+        try{
+
+            // Recherche de l'utilisateur et vérification
+            let customer = await Customer.findOne({ where: {id: customerId}, raw: true})
+            if(customer === null) {
+                return res.status(404).json({ message: 'This customer does not exist !' })
+            }
+    
+            // Mise à jour de l'utilisateur
+            await Customer.update(req.body, { where: {id: customerId} })
+            return res.json({ message: 'Customer Updated' })
+        } catch(err){ 
+            return res.status(500).json({ message: 'Database Error', error: err })
+        }
+    } else {
+        return res.status(401).json({ message: 'Forbidden' });
     }
 }
 
