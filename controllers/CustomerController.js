@@ -134,7 +134,7 @@ exports.deleteCustomer = (req, res) => {
 
     if (res.tokenRole == "ADMIN" || customerId === res.tokenId) {
         // Suppression de l'utilisateur
-        Customer.destroy({ where: {id: tokenId}, force: true})
+        Customer.destroy({ where: {id: customerId}, force: true})
             .then(() => res.status(200).json({ message: 'Customer deleted' }))
             .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
     } else {

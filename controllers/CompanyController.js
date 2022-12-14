@@ -1,18 +1,15 @@
 const db = require('./../models/index');
-const Companies = db['Companies'];
+const Company = db['Companies'];
 
 /**********************************/
 /*** Routage de la ressource Company */
 exports.getAllCompanies = (req, res) => {
-    if (res.tokenRole == "ADMIN") {
-        Companies.findAll()
-            .then(companies => res.json({ data: companies }))
-            .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
-    }
+    Company.findAll()
+        .then(companies => res.json({ data: companies }))
+        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
 exports.getCompany = async (req, res) => {
-
     let companyId = parseInt(req.params.id)
 
     // Vérification si le champ id est présent et cohérent
@@ -22,12 +19,13 @@ exports.getCompany = async (req, res) => {
 
     try{
         // Récupération de l'entreprise et vérification
-        let company = await Companies.findOne({ where: { id: companyId }})
+        let company = await Company.findOne({ where: { id: companyId }})
         if (company === null) {
             return res.status(404).json({ message: 'This company does not exist !' })
         }
 
         return res.json({ data: company })
+
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
     }    
@@ -43,11 +41,11 @@ exports.addCompany = async (req, res) => {
 
     try {
         // Vérification si l'entrprise est déjà enregistrée
-        const company = await Companies.findOne({ where: { siret: parseInt(siret) }, raw: true })
+        const company = await Company.findOne({ where: { siret: parseInt(siret) }, raw: true })
         if (company !== null) {
             return res.status(409).json({ message: `The siret n° ${siret} is already registered in the database` })
         }
-        let companyc = await Companies.create(req.body)
+        let companyc = await Company.create(req.body)
     
         return res.json({ message: 'Company Created', data: { companyc } })
 
@@ -67,15 +65,20 @@ exports.updateCompanyOld = async (req, res) => {
         return res.status(400).json({ message: 'Missing parameter' })
     }
 
+    // Si le token contient bien un rôle et un token
+    if (!res.tokenRole || !res.tokenCompany) {
+        return res.status(400).json({ message: 'Missing token' })
+    }
+
     try{
         // Recherche de l'utilisateur et vérification
-        let user = await Companies.findOne({ where: {id: companyId}, raw: true})
+        let user = await Company.findOne({ where: {id: companyId}, raw: true})
         if(user === null){
             return res.status(404).json({ message: 'This company does not exist !'})
         }
 
         // Mise à jour de l'utilisateur
-        await Companies.update(req.body, { where: {id: companyId}})
+        await Company.update(req.body, { where: {id: companyId}})
         return res.json({ message: 'Company Updated'})
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
@@ -95,63 +98,44 @@ exports.updateCompany = async (req, res) => {
         return res.status(400).json({ message: 'Missing token' })
     }
     
-    if (res.tokenRole == "ADMIN" || companyId === res.tokenId) {
+    if (res.tokenRole == "ADMIN" || companyId === res.tokenCompany) {
         try{
-
             // Recherche de l'utilisateur et vérification
-            let customer = await Customer.findOne({ where: {id: customerId}, raw: true})
-            if(customer === null) {
-                return res.status(404).json({ message: 'This customer does not exist !' })
+            let company = await Company.findOne({ where: {id: companyId}, raw: true})
+            if(company === null) {
+                return res.status(404).json({ message: 'This company does not exist !' })
             }
     
             // Mise à jour de l'utilisateur
-            await Customer.update(req.body, { where: {id: customerId} })
-            return res.json({ message: 'Customer Updated' })
+            await Company.update(req.body, { where: {id: companyId} })
+            return res.json({ message: 'Company Updated' })
         } catch(err){ 
-            return res.status(500).json({ message: 'Database Error', error: err })
+            return res.status(500).json({ message: 'Database Error' })
         }
     } else {
         return res.status(401).json({ message: 'Forbidden' });
     }
 }
 
-exports.untrashCompany =  (req, res) => {
-    let companyId = parseInt(req.params.id)
-
-    // Vérification si le champ id est présent et cohérent
-    if (!companyId) {
-        return res.status(400).json({ message: 'Missing parameter' })
-    }
-    
-    Companies.restore({ where: { id: companyId }})
-        .then(() => res.status(204).json({}))
-        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
-}
-
-exports.trashCompany = (req, res) => {
-    let companyId = parseInt(req.params.id)
-
-    // Vérification si le champ id est présent et cohérent
-    if (!companyId) {
-        return res.status(400).json({ message: 'Missing parameter' })
-    }
-
-    // Suppression de l'utilisateur
-    Companies.destroy({ where: {id: companyId}})
-        .then(() => res.status(204).json({}))
-        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
-}
-
 exports.deleteCompany =  (req, res) => {
-    let companyId = parseInt(req.params.id)
+    let companyId = parseInt(req.params.id);
 
     // Vérification si le champ id est présent et cohérent
     if (!companyId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
 
-    // Suppression de l'utilisateur
-    Companies.destroy({ where: {id: companyId}, force: true})
-        .then(() => res.status(204).json({}))
-        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+    // Si le token contient bien un rôle et un token
+    if (!res.tokenRole || !res.tokenCompany) {
+        return res.status(400).json({ message: 'Missing token' })
+    }
+
+    if (res.tokenRole == "ADMIN" || companyId === res.tokenCompany) {
+        // Suppression de l'entreprise
+        Company.destroy({ where: {id: companyId}, force: true})
+            .then(() => res.status(200).json({ message: 'Customer deleted' }))
+            .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+    } else {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
 }
