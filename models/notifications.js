@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     customers_id: DataTypes.INTEGER,
     name: DataTypes.STRING,
     content: DataTypes.STRING,
-    read_at: DataTypes.BOOLEAN,
+    read_at: DataTypes.DATE,
     notifications_type: DataTypes.STRING
   }, {
     sequelize,
