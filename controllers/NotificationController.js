@@ -32,6 +32,27 @@ exports.getNotification = async (req, res) => {
     }    
 }
 
+exports.getUserNotifications = async (req, res) => {
+    let notificationId = parseInt(req.params.id)
+
+    // Vérification si le champ id est présent et cohérent
+    if (!notificationId) {
+        return res.json(400).json({ message: 'Missing Parameter' })
+    }
+
+    try{
+        // Récupération de la notification et vérification
+        let notification = await Notifications.findOne({ where: { id: notificationId }})
+        if (notification === null) {
+            return res.status(404).json({ message: 'This notification does not exist !' })
+        }
+
+        return res.json({ data: notification })
+    }catch(err){
+        return res.status(500).json({ message: 'Database Error', error: err })
+    }    
+}
+
 
 
 exports.deleteNotification =  (req, res) => {

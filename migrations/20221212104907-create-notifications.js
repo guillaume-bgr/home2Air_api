@@ -23,7 +23,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       read_at: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.DATE
       },
       notifications_type: {
         type: Sequelize.STRING
