@@ -8,6 +8,7 @@ function authToken(req, res, next) {
             var decoded = jwt.verify(authToken[1], process.env.SECRET_KEY);
             res.tokenId = decoded.id;
             res.tokenRole = decoded.role;
+            res.tokenCompany = decoded.company;
             next()
           } catch(err) {
             if(err.name == 'TokenExpiredError'){
