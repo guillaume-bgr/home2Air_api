@@ -26,7 +26,7 @@ exports.getNotification = async (req, res) => {
 
     try{
         // Récupération de l'utilisateur et vérification
-        let notification = await Notification.findOne({ include: ["Roles", "Companies"], where: { id: notificationId }})
+        let notification = await Notification.findOne({where: { id: notificationId }})
         if (notification === null) {
             return res.status(404).json({ message: 'This notification does not exist !' })
         }
@@ -46,17 +46,10 @@ exports.addNotification = async (req, res) => {
     }
 
     try {
-        // Vérification si l'utilisateur existe déjà
-        const notification = await Notification.findOne({ where: { email: email }, raw: true })
-        if (notification !== null) {
-            return res.status(409).json({ message: `The notification ${email} already exists !` })
-        }
-        const hash = await bcrypt.hash(password, 10);
-
         // Création de l'utilisateur
-        let notificationc = await Notification.create({...req.body, password: hash})
+        let notification = await Notification.create(req.body)
     
-        return res.json({ message: 'Notification Created', data: { notificationc } })
+        return res.json({ message: 'Notification Created', data: { notification } })
 
     }catch(err){
         if(err.name == 'SequelizeDatabaseError'){
@@ -75,13 +68,12 @@ exports.updateNotification = async (req, res) => {
     }
 
     // Si le token contient bien un rôle et un token
-    if (!res.tokenRole || !res.tokenId) {
+    if (!res.tokenRole) {
         return res.status(400).json({ message: 'Missing token' })
     }
     
     if (res.tokenRole == "ADMIN") {
         try{
-
             // Recherche de l'utilisateur et vérification
             let notification = await Notification.findOne({ where: {id: notificationId, user_id: res.tokenId}, raw: true})
             if(notification === null) {
