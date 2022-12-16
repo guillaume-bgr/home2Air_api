@@ -7,15 +7,10 @@ exports.getUserBuildings = (req, res) => {
     customerId = req.params.id;
     Building.findAll({
         include: [
-          {
-            model: "Customers",
-            through: 'Customers-Buildings',
-            where: {
-              customer_id: customerId
-            }
-          }
+          'Customers'
         ]
     })
         .then(companies => res.json({ data: companies }))
-        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+        // .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
+        .catch(err => console.log(err));
 }
