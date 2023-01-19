@@ -9,7 +9,7 @@ exports.getAllCustomers = (req, res) => {
     if (res.tokenRole == "ADMIN") {
         Customer.findAll({
             order: [['createdAt', 'DESC']],
-            include: ["Roles", "Companies"]
+            include: ["Roles", "Companies", "Buildings"]
         })
             .then(customers => res.json({ data: customers }))
             .catch(err => res.status(500).json({ message: 'Database Error', error: err }))

@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   class Buildings extends Model {
     static associate(models) {
       Buildings.belongsToMany(models.Customers, {
-        through: 'Customers-Buildings'
+        through: 'Customers_Buildings'
       })
     }
   }
