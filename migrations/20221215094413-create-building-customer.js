@@ -3,20 +3,14 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('Customers_Buildings', {
+    await queryInterface.createTable('customers_buildings', {
       customerId: {
         type: Sequelize.INTEGER,
-        references: {
-          model: 'Customers',
-          key: 'id'
-        }
+        primaryKey: true,
       },
       buildingId: {
         type: Sequelize.INTEGER,
-        references: {
-          model: 'Buildings',
-          key: 'id'
-        }
+        primaryKey: true,
       },
       createdAt: {
         allowNull: false,
@@ -30,6 +24,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    await queryInterface.dropTable('Customers-Buildings');
+    await queryInterface.dropTable('customers_buildings');
   }
 };

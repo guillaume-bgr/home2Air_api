@@ -33,8 +33,8 @@ try {
     }
 
     // Création de l'utilisateur
-    let building = await Customer.addBuilding({...req.body, customers_id: res.tokenId})
-
+    let building = await Building.create(req.body)
+    customer.addBuildings(building)
     return res.json({ message: 'Customer Created', data: { building } })
 
 }catch(err){
