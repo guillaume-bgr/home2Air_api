@@ -7,14 +7,14 @@ module.exports = {
       id: {
         type: Sequelize.INTEGER,
       },
-      customers_id: {
+      customerId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Customers',
           key: 'id'
         }
       },
-      buildings_id: {
+      buildingId: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Buildings',
