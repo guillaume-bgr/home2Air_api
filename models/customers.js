@@ -26,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
         as: 'Companies',
         foreignKey: 'companies_id',
       })
+      Customers.belongsToMany(models.Buildings, {
+        through: 'Customer_Buildings'
+      })
     }
 
     toJSON() {

@@ -8,7 +8,8 @@ const jwt = require('jsonwebtoken');
 exports.getAllCustomers = (req, res) => {
     if (res.tokenRole == "ADMIN") {
         Customer.findAll({
-            include: ["Roles", "Companies"]
+            order: [['createdAt', 'DESC']],
+            include: ["Roles", "Companies", "Buildings"]
         })
             .then(customers => res.json({ data: customers }))
             .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
@@ -134,7 +135,7 @@ exports.deleteCustomer = (req, res) => {
 
     if (res.tokenRole == "ADMIN" || customerId === res.tokenId) {
         // Suppression de l'utilisateur
-        Customer.destroy({ where: {id: tokenId}, force: true})
+        Customer.destroy({ where: {id: customerId}, force: true})
             .then(() => res.status(200).json({ message: 'Customer deleted' }))
             .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
     } else {
