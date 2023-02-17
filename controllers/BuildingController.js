@@ -8,7 +8,6 @@ const Customer = db['Customers'];
 exports.getBuildings = async (req, res) => {
     try {
         const buildings = await Building.findAll({
-        // attributes: ['customer_name'],
         include: {
             model: Customer,
             through: {
@@ -17,51 +16,19 @@ exports.getBuildings = async (req, res) => {
         },
         });
     
-        res.status(200).json({
+        return res.status(200).json({
         buildings,
         });
     } catch (error) {
-        res.status(500).json(error);
-    }
-}
-
-exports.getCustomerBuildings = async (req, res) => {
-    let customerId = parseInt(req.params.id)
-    if (!customerId) {
-        return res.json(400).json({ message: 'Missing Parameter' })
-    }
-
-    try {
-        const response = await Customer.findOne({
-            attributes: ['id', 'first_name', 'last_name', 'email', 'password','img', 'notifications', 'roles_id', 'companies_id', 'subscriptions_id'],
-            where: {
-                id: req.params.id,
-            },
-            include: {
-                model: Building,
-                attributes: ['id', 'name'],
-                through: {
-                    attributes: ['customerId', 'isOwner'],
-                },
-            },
-        });
-        res.status(200).json(response.Buildings)
-    } catch(err){
-        if(err.name == 'SequelizeDatabaseError'){
-            res.status(500).json({ message: 'Database Error', error: err })
-        }
-        res.status(500).json({ message: 'Hash Process Error', error: err})        
+        return res.status(500).json(error);
     }
 }
 
 exports.getBuilding = async (req, res) => {
     let buildingId = parseInt(req.params.id)
-
-    // Vérification si le champ id est présent et cohérent
     if (!buildingId) {
         return res.json(400).json({ message: 'Missing Parameter' })
     }
-
     try { 
         let building = await Building.findOne({
             where: {
@@ -78,7 +45,6 @@ exports.getBuilding = async (req, res) => {
         if (building === null) {
             return res.status(404).json({ message: 'This building does not exist !' })
         }
-
         return res.json({ data: building })
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
@@ -103,31 +69,97 @@ exports.addBuilding = async (req, res) => {
             through: { isOwner: true }
         })
 
-        res.status(201).json({ message: 'Building successfully created' });
+        return res.status(201).json({ message: 'Building successfully created' });
     } catch (error) {
         console.log(error);
-        res.status(error.status || 500).json({
+        return res.status(error.status || 500).json({
         message: error.message,
         });
     }
 }
 
 exports.updateBuilding = async (req, res) => {
-    const id = res.tokenId
-    if (!id) {
+    const userId = res.tokenId
+    if (!userId) {
         return res.status(403).json({ message: 'Forbidden' })
     } else if (!req.params.id) {
         return res.status(400).json({ message: 'Missing Parameter' })
     }
-
     const { name } = req.body
     if ( !name ) {
         req.body.name = 'Nouveau building'
     }
-    console.log(res);
-    const building = this.getBuilding({params: {id: id}})
-    if ( !building ) {
-        console.log(res);
-        return res.status(404).json({ message: 'Building not found' })
+    try {
+        const building = await Building.findOne({
+            where: {
+                id: req.params.id,
+            },
+            include: {
+                model: Customer,
+                attributes: ["id", "first_name", "last_name", "email", "roles_id", "companies_id"],
+                through: {
+                    attributes: ['isOwner'],
+                    where: {
+                        isOwner: true,
+                    },
+                },
+            },
+        });
+        if ( !building ) {
+            return res.status(404).json({ message: 'Building not found' })
+        }
+        if ( !building.Customers.length == 0 ) {
+            building.name = req.body.name
+            await building.save();
+            return res.status(200).json({
+                building,
+            });
+        }
+        return res.status(403).json({message: 'Building ownership needed for this operation'})
+    } catch(error) {
+        console.log(error);
+        return res.status(error.status || 500).json({
+            message: error.message,
+        });
     }
 }
+
+exports.deleteBuilding = async (req, res) => {
+    const userId = res.tokenId
+    if (!userId) {
+        return res.status(403).json({ message: 'Forbidden' })
+    } else if (!req.params.id) {
+        return res.status(400).json({ message: 'Missing Parameter' })
+    }
+    try {
+        const building = await Building.findOne({
+            where: {
+                id: req.params.id,
+            },
+            include: {
+                model: Customer,
+                attributes: ["id", "first_name", "last_name", "email", "roles_id", "companies_id"],
+                through: {
+                    attributes: ['isOwner'],
+                    where: {
+                        customerId: userId,
+                        isOwner: true,
+                    },
+                },
+            },
+        });
+        if ( !building ) {
+            return res.status(404).json({ message: 'Building not found' })
+        }
+        if ( !building.Customers.length == 0 ) {
+            let destroy = await building.destroy();
+            return res.status(200).json({ message: 'Building deleted', destroy: destroy })
+        }
+        return res.status(403).json({message: 'Building ownership needed for this operation'})
+    } catch(error) {
+        return res.status(error.status || 500).json({
+            message: error.message,
+        });
+    }
+}
+
