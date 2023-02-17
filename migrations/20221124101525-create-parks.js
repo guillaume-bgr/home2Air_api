@@ -12,17 +12,17 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      companies_id: {
+      company_id: {
         type: Sequelize.INTEGER,
         references: {
           model: "Companies",
           key: "id"
         }
       },
-      customers_id: {
+      building_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: "Customers",
+          model: "Buildings",
           key: "id"
         }
       },
