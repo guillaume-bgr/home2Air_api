@@ -9,5 +9,6 @@ module.exports = (app) => {
         router.delete('/:id', authToken, CustomerController.deleteCustomer); // Delete
         router.post('/authenticate', CustomerController.authenticateCustomer); // Authenticate
         router.get('/:id/findrole', authToken, CustomerController.getCustomerRoleById); // FindRole
+
     });
 }
