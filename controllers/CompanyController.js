@@ -59,34 +59,6 @@ exports.addCompany = async (req, res) => {
     }
 }
 
-exports.updateCompanyOld = async (req, res) => {
-    let companyId = parseInt(req.params.id)
-
-    // Vérification si le champ id est présent et cohérent
-    if (!companyId) {
-        return res.status(400).json({ message: 'Missing parameter' })
-    }
-
-    // Si le token contient bien un rôle et un token
-    if (!res.tokenRole || !res.tokenCompany) {
-        return res.status(400).json({ message: 'Missing token' })
-    }
-
-    try{
-        // Recherche de l'utilisateur et vérification
-        let user = await Company.findOne({ where: {id: companyId}, raw: true})
-        if(user === null){
-            return res.status(404).json({ message: 'This company does not exist !'})
-        }
-
-        // Mise à jour de l'utilisateur
-        await Company.update(req.body, { where: {id: companyId}})
-        return res.json({ message: 'Company Updated'})
-    }catch(err){
-        return res.status(500).json({ message: 'Database Error', error: err })
-    }
-}
-
 exports.updateCompany = async (req, res) => {
     let companyId = parseInt(req.params.id)
     
