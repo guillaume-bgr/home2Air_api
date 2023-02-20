@@ -8,6 +8,10 @@ module.exports = (sequelize, DataTypes) => {
       Buildings.belongsToMany(models.Customers, {
         through: 'Customer_Buildings'
       })
+      Buildings.hasMany(models.Parks, {
+        as: 'Parks',
+        foreignKey: 'building_id',
+      })
     }
   }
   Buildings.init({

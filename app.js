@@ -19,6 +19,8 @@ require('./routes/ticketRouter')(app);
 require('./routes/subscriptionRouter')(app);
 require('./routes/notificationRouter')(app);
 require('./routes/buildingRouter')(app);
+require('./routes/parkRouter')(app);
+
 
 // Server init
 app.listen('3000', 'localhost', () => {

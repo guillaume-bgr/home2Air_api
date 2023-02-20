@@ -16,7 +16,7 @@ exports.getAllCustomers = (req, res) => {
                 {
                     model: Building,
                     through: {
-                        attributes: ['isOwner'],
+                        attributes: ["isOwner"],
                     },
                 },
                 {
@@ -102,7 +102,6 @@ exports.getCustomerBuildings = async (req, res) => {
 
 exports.addCustomer = async (req, res) => {
     const { email, password } = req.body
-
     // Validation des données reçues
     if (!email || !password ) {
         return res.status(400).json({ message: 'Missing Data' })
