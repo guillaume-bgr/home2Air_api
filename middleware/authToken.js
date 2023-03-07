@@ -16,6 +16,8 @@ function authToken(req, res, next) {
             }
             next()
           }
+    } else {
+      res.status(500).json({ message: 'No token given', err: 'NoTokenError'})
     }
 }
 

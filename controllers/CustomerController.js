@@ -184,7 +184,7 @@ exports.authenticateCustomer = async (req, res) => {
             hash = customer.password;
             bcrypt.compare(password, hash, function(err, response) {
                 if (response == true) {
-                    let token = generateJWT({ email: email, id: customer.id, company_id: customer["Companies.id"], role: customer["Roles.name"] }, "24h");
+                    let token = generateJWT({ email: email, id: customer.id, company: customer["Companies.id"], role: customer["Roles.name"] }, "24h");
                     let refresh = generateJWT({id: customer.id}, "24h");
                     return res.status(200).json({ message: 'Authenticated', data: { token, refresh } });
                 }
