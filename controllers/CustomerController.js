@@ -33,7 +33,7 @@ exports.getAllCustomers = (req, res) => {
                 },
             ],
         })
-        .then(customers => res.json(customers))
+        .then(customers => res.json({ count: customers.length, customers:customers }))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
     } else {
         return res.status(401).json({ message: 'Unauthorized' });
@@ -50,7 +50,7 @@ exports.getCustomer = async (req, res) => {
         if (customer === null) {
             return res.status(404).json({ message: 'This customer does not exist !' })
         }
-        return res.json({ data: customer })
+        return res.json(customer)
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
     }    
@@ -116,7 +116,7 @@ exports.addCustomer = async (req, res) => {
         // Création de l'utilisateur
         let customerc = await Customer.create({...req.body, password: hash})
     
-        return res.json({ message: 'Customer Created', data: { customerc } })
+        return res.status(201).json(customerc)
     }catch(err){
         if(err.name == 'SequelizeDatabaseError'){
             res.status(500).json({ message: 'Database Error', error: err })
@@ -139,7 +139,7 @@ exports.updateCustomer = async (req, res) => {
         try{
             // Recherche de l'utilisateur et vérification
             let customer = await Customer.findOne({ where: {id: customerId}, raw: true})
-            if(customer === null) {
+            if(!customer) {
                 return res.status(404).json({ message: 'This customer does not exist !' })
             }
             // Mise à jour de l'utilisateur
@@ -183,14 +183,17 @@ exports.authenticateCustomer = async (req, res) => {
         else {
             hash = customer.password;
             bcrypt.compare(password, hash, function(err, response) {
-                if (response == true) {
+                if (response) {
                     let token = generateJWT({ email: email, id: customer.id, company: customer["Companies.id"], role: customer["Roles.name"] }, "24h");
                     let refresh = generateJWT({id: customer.id}, "24h");
                     return res.status(200).json({ message: 'Authenticated', data: { token, refresh } });
+                } else {
+                    res.status(500).json({ message: 'Hash process Error', error: err})    
                 }
             })
         }
     } catch(err) { 
+        console.log(err)
         if(err.name == 'SequelizeDatabaseError'){
             res.status(500).json({ message: 'Database Error', error: err })
         }
