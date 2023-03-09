@@ -17,11 +17,32 @@ jobs:
         node-version: [16.x, 18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
+    services:
+      db:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: 'secret'
+          MYSQL_DATABASE: 'home2air_test'
+        ports:
+          - '3306:3306'
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        
+
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        # cache: 'npm'
-    - run: yarn install
+        cache: 'npm'
+    - run: npm ci
+    - name: Start MySQL server
+      run: sudo mysqld --user=mysql --bind-address=127.0.0.1 --port=${{ job.services.db.ports['3306'] }} --datadir=/var/lib/mysql --log-error=/var/log/mysql/error.log --pid-file=/var/run/mysqld/mysqld.pid --socket=/var/run/mysqld/mysqld.sock --default-authentication-plugin=mysql_native_password &
+    - name: Wait for MySQL to start
+      run: |
+        while ! mysqladmin ping -h127.0.0.1 -P${{ job.services.db.ports['3306'] }} -uroot -psecret --silent; do
+          echo "Waiting for MySQL to start..."
+          sleep 1
+        done
+    - run: mysql --host 127.0.0.1 --port ${{ job.services.db.ports['3306'] }} -u root -psecret -e "SHOW DATABASES"
+    - run: npm test
