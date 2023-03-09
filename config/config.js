@@ -8,11 +8,11 @@ module.exports = {
       "port": process.env.DATABASE_PORT,
       "dialect": "mysql"
   },
-  "test": {
-    "username": "root",
-    "password": "secret",
-    "database": "home2air",
-    "dialect": "mysql",
-    "port": "3306"
-  }
+  // "test": {
+  //   "username": "root",
+  //   "password": "secret",
+  //   "database": "home2air",
+  //   "dialect": "mysql",
+  //   "port": "3306"
+  // }
 }

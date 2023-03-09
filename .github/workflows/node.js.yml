@@ -21,7 +21,7 @@ jobs:
       db:
         image: mysql
         env:
-          MYSQL_ROOT_PASSWORD: 'secret'
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_DATABASE: 'home2air'
         ports:
           - '3306:3306'
