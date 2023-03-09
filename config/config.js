@@ -10,9 +10,9 @@ module.exports = {
   },
   "test": {
     "username": "root",
-      "password": "secret",
-      "database": "home2air_test",
-      "dialect": "mysql",
-      "port": "3306"
+    "password": "secret",
+    "database": "home2air",
+    "dialect": "mysql",
+    "port": "3306"
   }
 }
