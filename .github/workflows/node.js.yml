@@ -34,7 +34,6 @@ jobs:
       env: 
         DATABASE_USERNAME: "root"
         DATABASE_NAME: "home2air"
-        DATABASE_PASSWORD: ""
         DATABASE_PORT: 3306
       uses: actions/setup-node@v3
       with:
