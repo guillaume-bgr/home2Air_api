@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 exports.getAllNotifications = (req, res) => {
     if (res.tokenRole == "ADMIN") {
         Notification.findAll({
-            order: [['createdAt', 'DESC']]
+            order: [['createdAt', 'DESC']],
         })
             .then(notifications => res.json({ data: notifications }))
             .catch(err => res.status(500).json({ message: 'Database Error' }))
@@ -25,8 +25,8 @@ exports.getNotification = async (req, res) => {
     }
 
     try{
-        // Récupération de l'utilisateur et vérification
-        let notification = await Notification.findOne({where: { id: notificationId }})
+        // Récupération de la notification et vérification
+        let notification = await Notification.findOne({where: { id: notificationId }},  {include: ["Notification_Types"]})
         if (notification === null) {
             return res.status(404).json({ message: 'This notification does not exist !' })
         }
@@ -38,15 +38,15 @@ exports.getNotification = async (req, res) => {
 }
 
 exports.addNotification = async (req, res) => {
-    const { email, password } = req.body
+    const { name, content, customers_id, notifications_type } = req.body
 
     // Validation des données reçues
-    if (!email || !password ) {
+    if (!name || !content || !customers_id || !notifications_type) {
         return res.status(400).json({ message: 'Missing Data' })
     }
 
     try {
-        // Création de l'utilisateur
+        // Création de la notification
         let notification = await Notification.create(req.body)
     
         return res.json({ message: 'Notification Created', data: { notification } })
@@ -74,13 +74,13 @@ exports.updateNotification = async (req, res) => {
     
     if (res.tokenRole == "ADMIN") {
         try{
-            // Recherche de l'utilisateur et vérification
+            // Recherche de la notification et vérification
             let notification = await Notification.findOne({ where: {id: notificationId, user_id: res.tokenId}, raw: true})
             if(notification === null) {
                 return res.status(404).json({ message: 'This notification does not exist !' })
             }
     
-            // Mise à jour de l'utilisateur
+            // Mise à jour de la notification
             await Notification.update(req.body, { where: {id: notificationId} })
             return res.json({ message: 'Notification Updated' })
         } catch(err){ 
@@ -105,7 +105,7 @@ exports.deleteNotification = (req, res) => {
     }
 
     if (res.tokenRole == "ADMIN" || notificationId === res.tokenId) {
-        // Suppression de l'utilisateur
+        // Suppression de la notification
         Notification.destroy({ where: {id: notificationId}, force: true})
             .then(() => res.status(200).json({ message: 'Notification deleted' }))
             .catch(err => res.status(500).json({ message: 'Database Error', error: err }))

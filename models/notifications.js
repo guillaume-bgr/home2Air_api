@@ -9,6 +9,12 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
+    static associate(models) {
+      Notifications.belongsTo(models.Roles, {
+        as: 'Notification_Types',
+        foreignKey: 'notifications_type',
+      })
+    }
   }
   Notifications.init({
     customers_id: DataTypes.INTEGER,

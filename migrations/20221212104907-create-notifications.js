@@ -26,7 +26,11 @@ module.exports = {
         type: Sequelize.DATE
       },
       notifications_type: {
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER,
+        references: {
+          model: "Notification_Types",
+          key: "id"
+        }
       },
       createdAt: {
         allowNull: false,

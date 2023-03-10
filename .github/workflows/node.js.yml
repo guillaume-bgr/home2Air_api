@@ -1,0 +1,65 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    services:
+      db:
+        image: mysql
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_DATABASE: 'home2air'
+        ports:
+          - '3306:3306'
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      env: 
+        DATABASE_USERNAME: "root"
+        DATABASE_NAME: "home2air"
+        DATABASE_PORT: 3306
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - name: Start MySQL server
+      run: sudo mysqld --user=mysql --bind-address=127.0.0.1 --port=${{ job.services.db.ports['3306'] }} --datadir=/var/lib/mysql --log-error=/var/log/mysql/error.log --pid-file=/var/run/mysqld/mysqld.pid --socket=/var/run/mysqld/mysqld.sock --default-authentication-plugin=mysql_native_password &
+    - name: Wait for MySQL to start
+      run: |
+        while ! mysqladmin ping -h127.0.0.1 -P${{ job.services.db.ports['3306'] }} -uroot --silent; do
+          echo "Waiting for MySQL to start..."
+          sleep 1
+        done
+    - run: mysql --host 127.0.0.1 --port ${{ job.services.db.ports['3306'] }} -u root -e "SHOW DATABASES"
+    # - run: npm test
+    - name: Deploy to Server
+      uses: easingthemes/ssh-deploy@main
+      env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-rlgoDzvc -i --delete"
+          SOURCE: "./"
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.REMOTE_TARGET }}
+          EXCLUDE: "/dist/, /node_modules/"
+          SCRIPT_AFTER: |
+            ls
+            echo $RSYNC_STDOUT

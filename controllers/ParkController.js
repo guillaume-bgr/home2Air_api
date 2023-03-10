@@ -31,22 +31,8 @@ exports.addPark = async (req, res) => {
         return res.status(400).json({ message: 'Missing Data' })
     }
     try {
-        const park = await Park.findOne({ where: { name: name, building_id: building_id }, raw: true })
-        let parkc;
-        if (park !== null) {
-            let copyInt = 1
-            let parks = await Park.findAll({where: {building_id: building_id}})
-            for (let park in parks) {
-                if (park.name == req.body.name) {
-                    copyInt += 1
-                }
-            }
-            parkc = await Park.create({name: name, company_id: company_id, building_id: building_id})
+            let parkc = await Park.create(req.body);
             return res.json({ message: 'Park Created', data: { parkc } })
-        } else {
-            parkc = await Park.create(req.body);
-            return res.json({ message: 'Park Created', data: { parkc } })
-        }
     }catch(err){
         console.log(err)
         if(err.name == 'SequelizeDatabaseError'){
@@ -81,7 +67,7 @@ exports.updatePark = async (req, res) => {
             return res.json({ message: 'Park Updated', data: { park } })
         }
         await Park.update(req.body, { where: {id: parkId} })
-        return res.json({ message: 'Company Updated' })
+        return res.json({ message: 'Park Updated', data: { park } })
     } catch(err){ 
         console.log(err)
         return res.status(500).json({ message: 'Database Error' })
