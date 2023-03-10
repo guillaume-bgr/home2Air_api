@@ -5,23 +5,20 @@ const Customer = db['Customers'];
 /**********************************/
 /*** Routage de la ressource Building */
 
-exports.getBuildings = async (req, res) => {
-    try {
-        const buildings = await Building.findAll({
+exports.getBuildings = (req, res) => {
+    Building.findAll({
         include: {
             model: Customer,
+            where: {
+                id: res.tokenId
+            },
             through: {
-            attributes: ['isOwner'],
+                attributes: ['isOwner'],
             },
         },
-        });
-    
-        return res.status(200).json({
-        buildings,
-        });
-    } catch (error) {
-        return res.status(500).json(error);
-    }
+    })
+    .then(buildings => res.json({ count: buildings.length, buildings }))
+    .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
 exports.getBuilding = async (req, res) => {
@@ -32,7 +29,7 @@ exports.getBuilding = async (req, res) => {
     try { 
         let building = await Building.findOne({
             where: {
-                id: req.params.id,
+                id: buildingId,
             },
             include: {
                 model: Customer,
@@ -45,7 +42,7 @@ exports.getBuilding = async (req, res) => {
         if (building === null) {
             return res.status(404).json({ message: 'This building does not exist !' })
         }
-        return res.json({ data: building })
+        return res.json(building)
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err })
     }    
