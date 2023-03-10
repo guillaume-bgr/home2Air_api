@@ -37,7 +37,7 @@ module.exports = {
         },
         {
           id: 4,
-          name: 'INDIVIDUAL',
+          name: 'USER',
           createdAt: new Date(),
           updatedAt: new Date(),
       },

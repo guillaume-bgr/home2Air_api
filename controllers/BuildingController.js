@@ -55,20 +55,16 @@ exports.addBuilding = async (req, res) => {
     if (!res.tokenId) {
         return res.status(403).json({ message: 'Forbidden' })
     }
-
     const { name } = req.body
     if ( !name ) {
         req.body.name = 'Nouveau building'
     }
-
     try {
         let customer = await Customer.findByPk(parseInt(res.tokenId))
         let building = await Building.create(req.body)
-
         await building.addCustomer(customer, {
             through: { isOwner: true }
         })
-
         return res.status(201).json({ message: 'Building successfully created' });
     } catch (error) {
         console.log(error);
