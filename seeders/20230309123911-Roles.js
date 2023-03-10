@@ -18,13 +18,13 @@
 		'roles',
 		[
 			{
-				id: 1,
+				id: 2,
 				name: 'USER',
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
 			{
-				id: 2,
+				id: 1,
 				name: 'ADMIN',
 				createdAt: new Date(),
 				updatedAt: new Date(),
