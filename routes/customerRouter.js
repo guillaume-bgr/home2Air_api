@@ -1,13 +1,13 @@
 const CustomerController = require('../controllers/CustomerController');
+const verifyUserRights = require('../middleware/verifyUserRights');
 const authToken = require('../middleware/authToken');
 module.exports = (app) => {
     app.group("/customers", (router) => {
-        router.get("/", authToken, CustomerController.getAllCustomers); // FindAll
-        router.get('/:id', CustomerController.getCustomer); // FindOne
+        router.get("/", authToken, verifyUserRights, CustomerController.getAllCustomers); // FindAll
+        router.get('/:id', authToken, verifyUserRights, CustomerController.getCustomer); // FindOne
         router.post('/create', CustomerController.addCustomer); // Create
-        router.patch('/:id', authToken, CustomerController.updateCustomer); // Update
-        router.delete('/:id', authToken, CustomerController.deleteCustomer); // Delete
+        router.patch('/:id', authToken, verifyUserRights, CustomerController.updateCustomer); // Update
+        router.delete('/:id', authToken, verifyUserRights, CustomerController.deleteCustomer); // Delete
         router.post('/authenticate', CustomerController.authenticateCustomer); // Authenticate
-        router.get('/:id/findrole', authToken, CustomerController.getCustomerRoleById); // FindRole
     });
 }
