@@ -21,6 +21,7 @@ require('./routes/notificationRouter')(app);
 require('./routes/notificationTypesRouter')(app);
 require('./routes/buildingRouter')(app);    
 require('./routes/parkRouter')(app);
+require('./routes/sensorRouter')(app);
 
 
 // Server init
