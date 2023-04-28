@@ -9,14 +9,32 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      co: {
+      oxydants: {
         type: Sequelize.FLOAT
       },
-      no2: {
-        type: Sequelize.FLOAT
+      reducers: {
+        type: Sequelize.FLOAT,
       },
       nh3: {
-        type: Sequelize.FLOAT
+        type: Sequelize.FLOAT,
+      },
+      light: {
+        type: Sequelize.FLOAT,
+      },
+      pressure: {
+        type: Sequelize.FLOAT,
+      },
+      humidity: {
+        type: Sequelize.FLOAT,
+      },
+      pm1: {
+        type: Sequelize.FLOAT,
+      },
+      pm2_5: {
+        type: Sequelize.FLOAT,
+      },
+      pm10: {
+        type: Sequelize.FLOAT,
       },
       date: {
         type: Sequelize.DATE

@@ -12,6 +12,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         primaryKey: true,
       },
+      isOwner: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

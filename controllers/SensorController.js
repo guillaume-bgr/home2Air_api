@@ -70,7 +70,6 @@ exports.updateSensor = async (req, res) => {
     }
 }
 
-
 exports.deleteSensor =  (req, res) => {
     let sensorId = parseInt(req.params.id)
     // Vérification si le champ id est présent et cohérent
@@ -103,12 +102,31 @@ exports.getSensorHistory = async (req, res) => {
             [Sequelize.fn('avg', Sequelize.col('no2')), 'avgNo2'],
             [Sequelize.fn('avg', Sequelize.col('nh3')), 'avgNh3']], 
             where: {
-              sensors_id: sensorId,
-              createdAt: {
+            sensors_id: sensorId,
+            createdAt: {
                 [Op.between]: [lastWeek, Date.now()]
-              }
             }
-          }).then(sensorHistory => res.json({ data: sensorHistory }))
+        }
+        }).then(sensorHistory => res.json({ data: sensorHistory }))
+    }catch(err){
+        return res.status(500).json({ message: 'Database Error', error: err.message })
+    }
+}
+
+exports.saveSensorInput = async (req, res) => {
+    let sensorId = parseInt(req.params.id);
+    if (!sensorId) {
+        return res.status(400).json({ message: 'Missing parameter' });
+    }
+    try{
+        let sensor = await Sensors.findOne({ where: {id: sensorId}, raw: true})
+        if(sensor === null){
+            return res.status(404).json({ message: 'This sensor does not exist !'})
+        }
+        let sensorhc = await SensorHistory.create(req.body)
+        sensorhc.sensor_id = sensor.id;
+    
+        return res.json({ message: 'Sensor Input Saved', data: { sensorhc } })      
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err.message })
     }

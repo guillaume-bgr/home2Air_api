@@ -8,5 +8,6 @@ module.exports = (app) => {
         router.delete('/:id', SensorController.deleteSensor); // Delete
         router.get('/:id', SensorController.getSensor); // FindOne
         router.get('/sensor-history/:id', SensorController.getSensorHistory);
+        router.post('/save-input/:id', SensorController.saveSensorInput);
     });
 }
