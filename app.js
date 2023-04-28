@@ -23,10 +23,4 @@ require('./routes/buildingRouter')(app);
 require('./routes/parkRouter')(app);
 require('./routes/sensorRouter')(app);
 
-
-// Server init
-// app.listen('3000', 'localhost', () => {
-//     console.log('server start');
-// });
-
 module.exports = app;
