@@ -112,3 +112,22 @@ exports.getSensorHistory = async (req, res) => {
         return res.status(500).json({ message: 'Database Error', error: err.message })
     }
 }
+
+exports.saveSensorInput = async (req, res) => {
+    let sensorId = parseInt(req.params.id);
+    if (!sensorId) {
+        return res.status(400).json({ message: 'Missing parameter' });
+    }
+    try{
+        let sensor = await Sensors.findOne({ where: {id: sensorId}, raw: true})
+        if(sensor === null){
+            return res.status(404).json({ message: 'This sensor does not exist !'})
+        }
+        let sensorhc = await SensorHistory.create(req.body)
+        sensorhc.sensor_id = sensor.id;
+    
+        return res.json({ message: 'Sensor Input Saved', data: { sensorhc } })      
+    }catch(err){
+        return res.status(500).json({ message: 'Database Error', error: err.message })
+    }
+}
