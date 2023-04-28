@@ -123,7 +123,8 @@ exports.authenticateCustomer = async (req, res) => {
                 if (response) {
                     let token = generateJWT({ email: email, id: customer.id }, "24h")
                     let refresh = generateJWT({id: customer.id}, "24h")
-                    return res.status(200).json({ message: 'Authenticated', data: { token, refresh } })
+                    customer.password = undefined;
+                    return res.status(200).json({ message: 'Authenticated', data: { token, refresh, customer  } })
                 } else {
                     res.status(500).json({ message: 'Hash process Error', error: err})    
                 }
