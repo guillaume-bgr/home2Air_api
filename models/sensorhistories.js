@@ -14,9 +14,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   SensorHistories.init({
-    co: DataTypes.FLOAT,
-    no2: DataTypes.FLOAT,
+    oxydants: DataTypes.FLOAT,
+    reducers: DataTypes.FLOAT,
     nh3: DataTypes.FLOAT,
+    light: DataTypes.FLOAT,
+    pressure: DataTypes.FLOAT,
+    humidity: DataTypes.FLOAT,
+    pm1: DataTypes.FLOAT,
+    pm2_5: DataTypes.FLOAT,
+    pm10: DataTypes.FLOAT,
     date: DataTypes.DATE,
     sensors_id: DataTypes.INTEGER
   }, {
