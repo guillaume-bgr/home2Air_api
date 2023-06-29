@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       })
       Customers.belongsTo(models.Roles, {
         as: 'Roles',
-        foreignKey: 'id',
+        foreignKey: 'roles_id',
       })
       Customers.belongsTo(models.Companies, {
         as: 'Companies',

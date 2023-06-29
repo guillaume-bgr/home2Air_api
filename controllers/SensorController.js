@@ -90,11 +90,10 @@ exports.getSensorHistory = async (req, res) => {
     }
     try{
         // Recherche de l'utilisateur et vérification
-        let sensor = await Sensors.findOne({ where: {id: sensorId}, raw: true})
+        let sensor = await Sensors.findOne({ where: {id: sensorId}, raw: true});
         if(sensor === null){
-            return res.status(404).json({ message: 'This sensor does not exist !'})
+            return res.status(404).json({ message: 'This sensor does not exist !'});
         }
-        console.log('test')
         var lastWeek = new Date();
         lastWeek.setDate(lastWeek.getDate() - 7);
         SensorHistory.findAll({
@@ -125,7 +124,6 @@ exports.saveSensorInput = async (req, res) => {
         }
         let sensorhc = await SensorHistory.create(req.body)
         sensorhc.sensor_id = sensor.id;
-    
         return res.json({ message: 'Sensor Input Saved', data: { sensorhc } })      
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err.message })

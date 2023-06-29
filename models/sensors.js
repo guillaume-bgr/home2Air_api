@@ -5,9 +5,13 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class Sensors extends Model {
     static associate(models) {
-      Sensors.hasOne(models.Parks, {
+      Sensors.belongsTo(models.Parks, {
         as: 'Parks',
         foreignKey: 'id',
+      })
+      Sensors.hasMany(models.SensorHistories, {
+        as: 'SensorHistories',
+        foreignKey: 'sensors_id',
       })
     }
   }

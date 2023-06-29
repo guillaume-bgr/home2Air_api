@@ -32,7 +32,7 @@ exports.getAllCustomers = (req, res) => {
             },
         ],
     })
-    .then(customers => res.json({ count: customers.length, customers:customers }))
+    .then(customers => res.json(customers))
     .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
@@ -42,7 +42,7 @@ exports.getCustomer = async (req, res) => {
         return res.json(400).json({ message: 'Missing Parameter' })
     }
     try {
-        let customer = await Customer.findOne({ include: ["Roles", "Companies", "Tickets"], where: { id: customerId }})
+        let customer = await Customer.findOne({ include: { all: true, nested: true }, where: { id: customerId }})
         if (customer === null) {
             return res.status(404).json({ message: 'This customer does not exist !' })
         }
@@ -86,7 +86,7 @@ exports.updateCustomer = async (req, res) => {
             return res.status(404).json({ message: 'This customer does not exist !' })
         }
         await Customer.update(req.body, { where: {id: customerId} })
-        return res.json({ message: 'Customer Updated' })
+        return res.json({ message:'Customer Updated' })
     } catch(err){ 
         return res.status(500).json({ message: 'Database Error', error: err })
     }
@@ -110,12 +110,12 @@ exports.deleteCustomer = async (req, res) => {
 exports.authenticateCustomer = async (req, res) => {
     const { email, password } = req.body
     if (!email || !password ) {
-        return res.status(400).json({ message: 'Missing Data' })
+        return res.status(400).json({ message: 'Missing Data' });
     }
     try {
-        const customer = await Customer.findOne({ include: ["Roles", "Companies"], where: { email: email }, raw: true })
+        const customer = await Customer.findOne({ include: ["Roles", "Companies"], where: { email: email } })
         if (customer == null) {
-            return res.status(404).json({ message: `Customer not found.` })
+            return res.status(404).json({ message: `Customer not found.` });
         }
         else {
             hash = customer.password
@@ -124,14 +124,13 @@ exports.authenticateCustomer = async (req, res) => {
                     let token = generateJWT({ email: email, id: customer.id }, "24h")
                     let refresh = generateJWT({id: customer.id}, "24h")
                     customer.password = undefined;
-                    return res.status(200).json({ message: 'Authenticated', data: { token, refresh, customer  } })
+                    return res.status(200).json({ message: 'Authenticated', data: { token, refresh, customer } })
                 } else {
-                    res.status(500).json({ message: 'Hash process Error', error: err})    
+                    return res.status(500).json({ message: 'Error validating password', error: err})    
                 }
             })
         }
-    } catch(err) { 
-        console.log(err)
+    } catch(err) {
         if(err.name == 'SequelizeDatabaseError'){
             res.status(500).json({ message: 'Database Error', error: err })
         }
