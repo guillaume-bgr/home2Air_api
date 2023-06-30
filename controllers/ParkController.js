@@ -29,12 +29,12 @@ exports.getPark = async (req, res) => {
 
 exports.addPark = async (req, res) => {
     const { name, company_id, building_id } = req.body
-    if ( !name || !company_id || !building_id ) {
+    if ( !name ) {
         return res.status(400).json({ message: 'Missing Data' })
     }
     try {
             let parkc = await Park.create(req.body);
-            return res.json({ message: 'Park Created', data: { parkc } })
+            return res.json({ message: 'Park Created', data: parkc })
     }catch(err){
         console.log(err)
         if(err.name == 'SequelizeDatabaseError'){
@@ -73,16 +73,9 @@ exports.deletePark =  (req, res) => {
     if (!parkId) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
-    if (!res.tokenRole || !res.tokenCompany) {
-        return res.status(400).json({ message: 'Missing token' })
-    }
-    if (res.tokenRole == "ADMIN" || parkId === res.parkId) {
-        Park.destroy({ where: {id: parkId}, force: true})
-            .then(() => res.status(200).json({ message: 'Park deleted' }))
-            .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
-    } else {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
+    Park.destroy({ where: {id: parkId}, force: true})
+        .then(() => res.status(200).json({ message: 'Park deleted' }))
+        .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
 exports.getParkSensors = async (req, res) => {
