@@ -1,4 +1,5 @@
 const db = require('./../models/index');
+const { Op } = require("sequelize");
 const Park = db['Parks'];
 
 exports.getAllParks = (req, res) => {
@@ -25,6 +26,29 @@ exports.getPark = async (req, res) => {
         console.log(err)
         return res.status(500).json({ message: 'Database Error', error: err })
     }    
+}
+
+exports.getParksByNameResearch = async (req, res) => {
+    const { research } = req.body;
+    if (!research) {
+        return res.status(400).json({ message: 'Missing Research criteria' })
+    }
+    try {
+        let parks = await Park.findAll({
+            where: {
+                name: {
+                    [Op.substring]: research
+                }
+            }
+        })
+        if (parks == []) {
+            return res.status(404).json({ message: 'No parks found for this research'})
+        }
+        return res.json({ data: parks })
+    } catch(err) {
+        console.log(err)
+        return res.status(500).json({ message: 'Database Error', error: err })
+    }
 }
 
 exports.addPark = async (req, res) => {

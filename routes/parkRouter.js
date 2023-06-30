@@ -4,6 +4,7 @@ const verifyUserRights = require('../middleware/verifyUserRights.js');
 module.exports = (app) => {
     app.group("/parks", (router) => {
         router.get("/", authToken, verifyUserRights, ParkController.getAllParks); // FindAll
+        router.get("/research", authToken, verifyUserRights, ParkController.getParksByNameResearch); // FindAll
         router.post('/create', ParkController.addPark); // Create
         router.patch('/:id', authToken, verifyUserRights, ParkController.updatePark); // Update
         router.delete('/:id', authToken, verifyUserRights, ParkController.deletePark); // Delete
