@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express')
 const router = express.Router();
 const app = express();
+const cors = require('cors')
 
 // Body parsers
 app.use(express.urlencoded({ extended: true }))
@@ -10,6 +11,7 @@ app.use(express.json())
 
 // Use static routes
 app.use(express.static('public'));
+app.use(cors())
 
 // Router imports
 require('./routes/customerRouter')(app);
