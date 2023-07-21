@@ -39,7 +39,8 @@ exports.getParksByNameResearch = async (req, res) => {
                 name: {
                     [Op.substring]: research
                 }
-            }
+            },
+            include: { all: true, nested: true }
         })
         if (parks == []) {
             return res.status(404).json({ message: 'No parks found for this research'})
