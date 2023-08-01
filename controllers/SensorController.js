@@ -3,6 +3,7 @@ const Sensors = db['Sensors'];
 const SensorHistory = db['SensorHistories'];
 const bcrypt = require('bcrypt');
 const { Op, Sequelize } = require("sequelize");
+const { calculateAqi, createFakeData } = require('../services/aqiService');
 
 /**********************************/
 /*** Routage de la ressource Sensor */
@@ -95,10 +96,10 @@ exports.getSensorHistory = async (req, res) => {
             return res.status(404).json({ message: 'This sensor does not exist !'});
         }
         var lastWeek = new Date();
-        lastWeek.setDate(lastWeek.getDate() - 7);
+        lastWeek.setDate(lastWeek.getDate() - 1);
         SensorHistory.findAll({
-            attributes: [[Sequelize.fn('avg', Sequelize.col('co')),'avgCo'],
-            [Sequelize.fn('avg', Sequelize.col('no2')), 'avgNo2'],
+            attributes: [[Sequelize.fn('avg', Sequelize.col('reducers')),'avgCo'],
+            [Sequelize.fn('avg', Sequelize.col('oxydants')), 'avgNo2'],
             [Sequelize.fn('avg', Sequelize.col('nh3')), 'avgNh3']], 
             where: {
             sensors_id: sensorId,
@@ -106,7 +107,12 @@ exports.getSensorHistory = async (req, res) => {
                 [Op.between]: [lastWeek, Date.now()]
             }
         }
-        }).then(sensorHistory => res.json({ data: sensorHistory }))
+        }).then((sensorHistory) => {
+            if (!sensorHistory.avgCo || !sensorHistory.avgNo2 || !sensorHistory.avgNh3) {
+                res.status(422).json({ message: 'No data' })
+            }
+            res.json({ data: sensorHistory })
+        })
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err.message })
     }
@@ -129,3 +135,51 @@ exports.saveSensorInput = async (req, res) => {
         return res.status(500).json({ message: 'Database Error', error: err.message })
     }
 }
+
+exports.calculateAqi = async (req, res) => {
+    const { polluant, polluantType } = req.body;
+
+    try {
+        let aqi = calculateAqi(polluant, polluantType);
+        return res.status(200).json({ aqi: aqi })
+    } catch (error) {
+        return res.status(500).json({ message: 'Database Error', error: error.message })
+    }
+}
+
+
+exports.createFakeData = async (req, res) => {
+    try {
+        let sensors = await Sensors.findAll();
+        let histories = [];
+        sensors.forEach(sensor => {
+            let data = createFakeData(req.body.hours)
+            let index = 0
+            data.forEach(dummydata => {
+                currentDate = new Date()
+                let sensorhc = SensorHistory.create({
+                    ...dummydata,
+                    date: currentDate.getTime() - (req.body.hours - index) * 60 * 60 * 1000,
+                    sensors_id: sensor.id
+                })
+                index = index + 1;
+                histories.push(sensorhc);
+            });
+        });
+        return res.status(200).json({ histories })
+    } catch (error) {
+        return res.status(500).json({ message: 'Database Error', error: error.message })
+    }
+}
+
+// exports.getSensorAqi = async (req, res) => {
+//     let sensorId = parseInt(req.params.id);
+//     if (!sensorId) {
+//         return res.status(400).json({ message: 'Missing sensor id' })
+//     }
+//     try {
+        
+//     } catch (error) {
+        
+//     }
+// }

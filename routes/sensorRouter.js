@@ -7,7 +7,9 @@ module.exports = (app) => {
         router.patch('/:id', SensorController.updateSensor); // Update
         router.delete('/:id', SensorController.deleteSensor); // Delete
         router.get('/:id', SensorController.getSensor); // FindOne
-        router.get('/sensor-history/:id', SensorController.getSensorHistory);
+        router.get('/sensor-history/:id', SensorController.getSensorHistory); 
         router.post('/save-input/:id', SensorController.saveSensorInput);
+        router.post('/aqi', SensorController.calculateAqi);
+        router.post('/fake-data', SensorController.createFakeData);
     });
 }
