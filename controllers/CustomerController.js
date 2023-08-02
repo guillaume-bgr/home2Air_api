@@ -4,6 +4,7 @@ const Building = db['Buildings'];
 const Company = db['Companies'];
 const Role = db['Roles'];
 const Ticket = db['Tickets'];
+const Park = db['Parks'];
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -138,6 +139,28 @@ exports.authenticateCustomer = async (req, res) => {
     }
 }
 
+exports.getCustomerSensors = async (req,res) => {
+    let id = req.params.id
+    if (!id){
+        return res.status(400).json({ message: 'Missing Data' });
+    }
+    try {
+        const customer = await Customer.findOne({ include: ["Roles", "Companies"], where: { id: id } })
+        if (customer == null) {
+            return res.status(404).json({ message: `Customer not found.` });
+        }else{
+                let park = await Park.findAll({ include: ["Sensors", "Buildings"], where: { company_id : customer.companies_id } });
+                if (park === null) {
+                    return res.status(404).json({ message: 'This park does not exist !' })
+                }
+                return res.json(park)
+        }
+
+    }catch (err) {
+        return res.status(500).json({ message: 'Database Error', error: err })
+    }
+
+}
 function generateJWT(payload, expiresIn) {
     return jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: expiresIn })
 }

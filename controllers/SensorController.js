@@ -79,7 +79,7 @@ exports.deleteSensor =  (req, res) => {
     }
     // Suppression de l'utilisateur
     Sensors.destroy({ where: {id: sensorId}, force: true})
-        .then(() => res.status(204).json({ message: 'Sensor Deleted'}))
+        .then(() => res.status(200).json({ message: 'Sensor Deleted'}))
         .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
 }
 
@@ -98,9 +98,40 @@ exports.getSensorHistory = async (req, res) => {
         var lastWeek = new Date();
         lastWeek.setDate(lastWeek.getDate() - 1);
         SensorHistory.findAll({
-            attributes: [[Sequelize.fn('avg', Sequelize.col('reducers')),'avgCo'],
-            [Sequelize.fn('avg', Sequelize.col('oxydants')), 'avgNo2'],
-            [Sequelize.fn('avg', Sequelize.col('nh3')), 'avgNh3']], 
+            where: {
+            sensors_id: sensorId,
+            createdAt: {
+                [Op.between]: [lastWeek, Date.now()]
+            }
+        }
+        }).then(sensorHistory => res.json({ data: sensorHistory }))
+    }catch(err){
+        return res.status(500).json({ message: 'Database Error', error: err.message })
+    }
+}
+
+exports.getAvgSensorHistory = async (req, res) => {
+    let sensorId = parseInt(req.params.id)
+    // Vérification si le champ id est présent et cohérent
+    if (!sensorId) {
+        return res.status(400).json({ message: 'Missing parameter' })
+    }
+    try{
+        // Recherche de l'utilisateur et vérification
+        let sensor = await Sensors.findOne({ where: {id: sensorId}, raw: true});
+        if(sensor === null){
+            return res.status(404).json({ message: 'This sensor does not exist !'});
+        }
+        var lastWeek = new Date();
+        lastWeek.setDate(lastWeek.getDate() - 7);
+        SensorHistory.findAll({
+            attributes: [[Sequelize.fn('avg', Sequelize.col('oxydants')),'avgOxydants'],
+            [Sequelize.fn('avg', Sequelize.col('reducers')), 'avgReducteur'],
+            [Sequelize.fn('avg', Sequelize.col('nh3')), 'avgNh3'],
+            [Sequelize.fn('avg', Sequelize.col('humidity')), 'avgHumidity'],
+            [Sequelize.fn('avg', Sequelize.col('pm1')), 'avgPm1'],
+            [Sequelize.fn('avg', Sequelize.col('pm10')), 'avgPm10'],
+        ], 
             where: {
             sensors_id: sensorId,
             createdAt: {

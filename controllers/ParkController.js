@@ -5,7 +5,7 @@ const Park = db['Parks'];
 exports.getAllParks = (req, res) => {
     Park.findAll({
         order: [['createdAt', 'DESC']],
-        include: { all: true, nested: true }
+        include: [{ all: true, nested: true }, "Buildings", "Sensors"]
     })
     .then(park => res.json(park))
     .catch(err => res.status(500).json({ message: 'Database Error', error: err }))
@@ -17,7 +17,8 @@ exports.getPark = async (req, res) => {
         return res.json(400).json({ message: 'Missing Parameter' })
     }
     try{
-        let park = await Park.findOne({ where: { id: parkId }})
+        let park = await Park.findOne({ where: { id: parkId },
+            include: ["Buildings", "Sensors"]})
         if (park === null) {
             return res.status(404).json({ message: 'This park does not exist !' })
         }
