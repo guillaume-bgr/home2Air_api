@@ -113,10 +113,10 @@ exports.getSensorHistory = async (req, res) => {
 exports.getDataOverTime = async (req, res) => {
     let sensorId = parseInt(req.params.id)
 
-    if (!sensorId || !req.body.time) {
+    if (!sensorId || !req.query.time) {
         return res.status(400).json({ message: 'Missing parameter' })
     }
-    if (isNaN(parseInt(req.body.time))) {
+    if (isNaN(parseInt(req.query.time))) {
         return res.status(400).json({ message: 'Number expected for time (in hours)' })
     }
     try {
@@ -125,7 +125,7 @@ exports.getDataOverTime = async (req, res) => {
             return res.status(404).json({ message: 'This sensor does not exist !' })
         }
         let lastTime = new Date();
-        lastTime.setHours(lastTime.getHours() - parseInt(req.body.time));
+        lastTime.setHours(lastTime.getHours() - parseInt(req.query.time));
         SensorHistory.findAll({
             where: {
                 sensors_id: sensorId,
