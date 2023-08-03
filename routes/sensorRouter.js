@@ -6,6 +6,7 @@ module.exports = (app) => {
         router.post('/create', SensorController.addSensor); // Create
         router.patch('/:id', SensorController.updateSensor); // Update
         router.delete('/:id', SensorController.deleteSensor); // Delete
+        router.get('/least-max-polluant', authToken, SensorController.getLeastAndMaxPolluant);
         router.get('/:id', SensorController.getSensor); // FindOne
         router.get('/sensor-history/:id', SensorController.getSensorHistory); 
         router.post('/save-input/:id', SensorController.saveSensorInput);

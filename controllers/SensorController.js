@@ -238,3 +238,44 @@ exports.createFakeData = async (req, res) => {
         return res.status(500).json({ message: 'Database Error', error: error.message })
     }
 }
+
+exports.getLeastAndMaxPolluant = async (req, res) => {
+    let polluant = req.query.polluant;
+    if (!polluant) {
+        return res.status(400).json('Missing parameter')
+    }
+    try {
+        let customer = await Customers.findOne({ where: {id: res.tokenId} });
+        let sensors = await Sensors.findAll({ 
+            where: {companies_id: customer.companies_id},
+            include: {
+                model: SensorHistory,
+                as: 'SensorHistories',
+            }
+        });
+        let sensorHistories = []
+        sensors.forEach(sensor => {
+            let mostRecent = {};
+            sensor.SensorHistories.forEach(sensorHistory => {
+                let jsTimestamp = Date.parse(sensorHistory.date);
+                if (jsTimestamp > Date.parse(mostRecent?.date) || !mostRecent?.date) {
+                    mostRecent = sensorHistory
+                }
+            })
+            sensorHistories.push(mostRecent);
+        })
+        let least = false;
+        let most = false;
+        sensorHistories.forEach(sensorHistory => {
+            if (sensorHistory[polluant] > most || most == false) {
+                most = sensorHistory[polluant];
+            }
+            if (sensorHistory[polluant] < least || least == false) {
+                least = sensorHistory[polluant];
+            }
+        })
+        return res.status(200).json({ polluant: req.query.polluant, min: least, max: most});
+    } catch (error) {
+        return res.status(500).json({ message: 'Database Error', error: error.message })
+    }
+} 
