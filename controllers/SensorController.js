@@ -110,6 +110,37 @@ exports.getSensorHistory = async (req, res) => {
     }
 }
 
+exports.getDataOverTime = async (req, res) => {
+    let sensorId = parseInt(req.params.id)
+
+    if (!sensorId || !req.body.time) {
+        return res.status(400).json({ message: 'Missing parameter' })
+    }
+    if (isNaN(parseInt(req.body.time))) {
+        return res.status(400).json({ message: 'Number expected for time (in hours)' })
+    }
+    try {
+        let sensor = await Sensors.findOne({ where: {id: sensorId} });
+        if (sensor === null) {
+            return res.status(404).json({ message: 'This sensor does not exist !' })
+        }
+        let lastTime = new Date();
+        lastTime.setHours(lastTime.getHours() - parseInt(req.body.time));
+        SensorHistory.findAll({
+            where: {
+                sensors_id: sensorId,
+                createdAt: {
+                    [Op.between]: [lastTime, Date.now()]
+                }
+            }
+        }).then((sensorHistories) => {
+            res.json(sensorHistories);
+        })
+    } catch(err) {
+        return res.status(500).json({ message: 'Database Error', error: err.message })
+    }
+}
+
 exports.getAvgSensorHistory = async (req, res) => {
     let sensorId = parseInt(req.params.id)
     // Vérification si le champ id est présent et cohérent
@@ -202,15 +233,3 @@ exports.createFakeData = async (req, res) => {
         return res.status(500).json({ message: 'Database Error', error: error.message })
     }
 }
-
-// exports.getSensorAqi = async (req, res) => {
-//     let sensorId = parseInt(req.params.id);
-//     if (!sensorId) {
-//         return res.status(400).json({ message: 'Missing sensor id' })
-//     }
-//     try {
-        
-//     } catch (error) {
-        
-//     }
-// }
