@@ -1,5 +1,6 @@
 const db = require('../models/index');
 const Sensors = db['Sensors'];
+const Customers = db['Customers'];
 const SensorHistory = db['SensorHistories'];
 const bcrypt = require('bcrypt');
 const { Op, Sequelize } = require("sequelize");
@@ -123,6 +124,10 @@ exports.getDataOverTime = async (req, res) => {
         let sensor = await Sensors.findOne({ where: {id: sensorId} });
         if (sensor === null) {
             return res.status(404).json({ message: 'This sensor does not exist !' })
+        }
+        let customer = await Customers.findOne({ where: {id: res.tokenId} })
+        if (customer.companies_id != sensor.companies_id) {
+            return res.status(403).json({ message: 'Forbidden'})
         }
         let lastTime = new Date();
         lastTime.setHours(lastTime.getHours() - parseInt(req.query.time));
