@@ -139,7 +139,7 @@ exports.authenticateCustomer = async (req, res) => {
     }
 }
 
-exports.getCustomerSensors = async (req,res) => {
+exports.getCustomerParks = async (req,res) => {
     let id = req.params.id
     if (!id){
         return res.status(400).json({ message: 'Missing Data' });
@@ -161,6 +161,7 @@ exports.getCustomerSensors = async (req,res) => {
     }
 
 }
+
 function generateJWT(payload, expiresIn) {
     return jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: expiresIn })
 }

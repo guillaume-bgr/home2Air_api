@@ -9,6 +9,6 @@ module.exports = (app) => {
         router.post('/authenticate', CustomerController.authenticateCustomer); // Authenticate
         router.patch('/:id', authToken, verifyUserRights, CustomerController.updateCustomer); // Update
         router.delete('/:id', authToken, verifyUserRights, CustomerController.deleteCustomer); // Delete
-        router.get("/:id/sensors", authToken, verifyUserRights, CustomerController.getCustomerSensors); // FindAll
+        router.get("/:id/parks", authToken, verifyUserRights, CustomerController.getCustomerSensors); // FindAll
     });
 }
