@@ -2,10 +2,10 @@ const SensorController = require('../controllers/SensorController.js');
 const authToken = require('../middleware/authToken');
 module.exports = (app) => {
     app.group("/sensors", (router) => {
-        router.get("/", SensorController.getAllSensors); // FindAll
-        router.post('/create', SensorController.addSensor); // Create
-        router.patch('/:id', SensorController.updateSensor); // Update
-        router.delete('/:id', SensorController.deleteSensor); // Delete
+        router.get("/", SensorController.getAllSensors);
+        router.post('/create', SensorController.addSensor);
+        router.patch('/:id', SensorController.updateSensor);
+        router.delete('/:id', SensorController.deleteSensor);
         router.get('/least-max-polluant', authToken, SensorController.getLeastAndMaxPolluant);
         router.get('/:id', SensorController.getSensor); // FindOne
         router.get('/sensor-history/:id', SensorController.getSensorHistory); 

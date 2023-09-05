@@ -52,8 +52,8 @@ let breakpoints = {
         },
         {
             quantity: {
-                low: 650,
-                high: 1249
+                low: 1250,
+                high: 1649
             },
             aqi: {
                 low: 301,
@@ -62,8 +62,8 @@ let breakpoints = {
         },
         {
             quantity: {
-                low: 650,
-                high: 1249
+                low: 1650,
+                high: 2049
             },
             aqi: {
                 low: 401,
@@ -291,7 +291,8 @@ let breakpoints = {
 
 exports.calculateAqi = (polluant, polluantType) => {
 
-    convertToProcessableData(polluant, polluantType);
+    polluant = convertToProcessableData(polluant, polluantType);
+    console.log(polluant);
 
     // Cette fonction est ici pour rappeler comment calculer l'aqi.
     // Elle reprend des formules trouvées dans ce document du gouvernement américain : https://www.airnow.gov/sites/default/files/2020-05/aqi-technical-assistance-document-sept2018.pdf
@@ -307,11 +308,19 @@ exports.calculateAqi = (polluant, polluantType) => {
 
     breakpoints[polluantType].forEach(breakpoint => {
         if (breakpoint.quantity.low <= polluant && breakpoint.quantity.high >= polluant) {
-            aqi = (breakpoint.aqi.high - breakpoint.aqi.low) / (breakpoint.quantity.high - breakpoint.quantity.low) * (polluant - breakpoint.quantity.low) + breakpoint.aqi.low
+            iSum = breakpoint.aqi.high - breakpoint.aqi.low;
+            bpSum = breakpoint.quantity.high - breakpoint.quantity.low;
+            valueMinBpLow = polluant - breakpoint.quantity.low;
+            console.log('breakpoint aqi high '+ breakpoint.aqi.high);
+            console.log('breakpoint aqi low '+ breakpoint.aqi.low);
+            console.log('breakpoint quantity high '+ breakpoint.quantity.high);
+            console.log('breakpoint quantity low '+ breakpoint.quantity.low);
+            console.log('breakpoint polluant '+ polluant);
+            aqi = iSum / bpSum * valueMinBpLow + breakpoint.aqi.low;
+            console.log('aqi '+aqi);
         }
     });
-
-    return aqi;
+    return parseInt(aqi);
 }
 
 exports.createFakeData = (hours) => {
@@ -319,8 +328,7 @@ exports.createFakeData = (hours) => {
     for (let index = 0; index < hours; index++) {
         let dummyData = {}
         for (let b in breakpoints) {
-            dummyData[b] = decreasingProbability(breakpoints[b][0].quantity.low, breakpoints[b][breakpoints[b].length - 2].quantity.high, 2.4)
-            dummyData[b] = convertToNativeData(dummyData[b], b)
+            dummyData[b] = decreasingProbability(breakpoints[b][0].quantity.low, breakpoints[b][breakpoints[b].length - 4].quantity.high, 4)
         }
         dummyData['humidity'] = getRand(40, 71)
         dummyData['pressure'] = getRand(970, 1030)
@@ -345,9 +353,9 @@ function decreasingProbability(min, max, exponent) {
 
 function convertToProcessableData(polluant, polluantType) {
     switch (polluantType) {
-        case "oxydants": 
-            polluant = parseInt(polluant * 1000);
-            break;
+        // case "oxydants": 
+        //     polluant = parseInt(polluant * 1000);
+        //     break;
         case "pm10":
             polluant = parseInt(polluant);
             break;
