@@ -91,20 +91,16 @@ exports.getSensorHistory = async (req, res) => {
         return res.status(400).json({ message: 'Missing parameter' })
     }
     try{
-        // Recherche de l'utilisateur et vérification
+        // Recherche du capteur et vérification
         let sensor = await Sensors.findOne({ where: {id: sensorId}, raw: true});
         if(sensor === null){
             return res.status(404).json({ message: 'This sensor does not exist !'});
         }
-        var lastWeek = new Date();
-        lastWeek.setDate(lastWeek.getDate() - 1);
-        SensorHistory.findAll({
+        SensorHistory.findOne({
             where: {
             sensors_id: sensorId,
-            createdAt: {
-                [Op.between]: [lastWeek, Date.now()]
-            }
-        }
+            },
+            order: [['date', 'DESC']]
         }).then(sensorHistory => res.json({ data: sensorHistory }))
     }catch(err){
         return res.status(500).json({ message: 'Database Error', error: err.message })
@@ -204,11 +200,26 @@ exports.saveSensorInput = async (req, res) => {
 }
 
 exports.calculateAqi = async (req, res) => {
-    const { polluant, polluantType } = req.body;
+    const { sensorHistory } = req.body;
+    if (!sensorHistory) {
+        return res.status(400).json({message: 'Missing parameter'});
+    }
+    jsonSH = JSON.parse(sensorHistory);
+    let polluants = ['oxydants', 'reducers', 'pm2_5', 'pm10'];
 
     try {
-        let aqi = calculateAqi(polluant, polluantType);
-        return res.status(200).json({ aqi: aqi })
+        let aqis = {};
+        for (const polluant of polluants) {
+            console.log(polluant);
+            aqis[polluant] = calculateAqi(jsonSH[polluant], polluant);
+        }
+        let finalAqi = 0;
+        for(let aqi in aqis) {
+            if (finalAqi < aqis[aqi]) {
+                finalAqi = aqis[aqi]
+            }
+        }
+        return res.status(200).json({ globalAQI: finalAqi, AQIs: aqis})
     } catch (error) {
         return res.status(500).json({ message: 'Database Error', error: error.message })
     }
