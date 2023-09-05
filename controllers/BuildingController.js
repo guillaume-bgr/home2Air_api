@@ -24,7 +24,7 @@ exports.getBuildings = (req, res) => {
 exports.getBuilding = async (req, res) => {
     let buildingId = parseInt(req.params.id)
     if (!buildingId) {
-        return res.json(400).json({ message: 'Missing Parameter' })
+        return res.status(400).json({ message: 'Missing Parameter' })
     }
     try { 
         let building = await Building.findOne({
