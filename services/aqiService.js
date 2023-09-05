@@ -292,7 +292,6 @@ let breakpoints = {
 exports.calculateAqi = (polluant, polluantType) => {
 
     polluant = convertToProcessableData(polluant, polluantType);
-    console.log(polluant);
 
     // Cette fonction est ici pour rappeler comment calculer l'aqi.
     // Elle reprend des formules trouvées dans ce document du gouvernement américain : https://www.airnow.gov/sites/default/files/2020-05/aqi-technical-assistance-document-sept2018.pdf
@@ -311,13 +310,7 @@ exports.calculateAqi = (polluant, polluantType) => {
             iSum = breakpoint.aqi.high - breakpoint.aqi.low;
             bpSum = breakpoint.quantity.high - breakpoint.quantity.low;
             valueMinBpLow = polluant - breakpoint.quantity.low;
-            console.log('breakpoint aqi high '+ breakpoint.aqi.high);
-            console.log('breakpoint aqi low '+ breakpoint.aqi.low);
-            console.log('breakpoint quantity high '+ breakpoint.quantity.high);
-            console.log('breakpoint quantity low '+ breakpoint.quantity.low);
-            console.log('breakpoint polluant '+ polluant);
             aqi = iSum / bpSum * valueMinBpLow + breakpoint.aqi.low;
-            console.log('aqi '+aqi);
         }
     });
     return parseInt(aqi);
