@@ -33,6 +33,10 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      mac_address: {
+        allowNull: true,
+        type: Sequelize.STRING
       }
     });
   },

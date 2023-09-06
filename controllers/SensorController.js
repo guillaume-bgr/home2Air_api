@@ -290,3 +290,29 @@ exports.getLeastAndMaxPolluant = async (req, res) => {
         return res.status(500).json({ message: 'Database Error', error: error.message })
     }
 } 
+
+
+exports.insertData = async (req, res) => {
+   
+    console.log(req.body)
+    console.log(req.body.mac_address)
+    if (!req.body) {
+        return res.json(400).json({ message: 'Missing Parameter' })
+    }
+    try{
+        // Récupération du sensor et vérification
+        let sensor = await Sensors.findOne({ where: { mac_address: req.body.mac_address }})
+        if ( sensor === null ) {
+            return res.status(404).json({ message: 'This sensor does not exist !' })
+        }
+        currentDate = new Date()
+        let sensorhc = SensorHistory.create({
+            ...req.body,
+            date: currentDate.getTime(),
+            sensors_id: sensor.id
+        })
+        return res.status(200).json({ sensorhc })
+    }catch(err){
+        return res.status(500).json({ message: 'Database Error', error: err })
+    }    
+}
