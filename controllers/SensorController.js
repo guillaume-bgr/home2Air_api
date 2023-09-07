@@ -1,6 +1,7 @@
 const db = require('../models/index');
 const Sensors = db['Sensors'];
 const Customers = db['Customers'];
+const Parks = db['Parks'];
 const SensorHistory = db['SensorHistories'];
 const bcrypt = require('bcrypt');
 const { Op, Sequelize } = require("sequelize");
@@ -225,6 +226,81 @@ exports.calculateAqi = async (req, res) => {
     }
 }
 
+exports.getCustomerSensorsAverageAqi = async (req, res) => {
+    
+    let polluants = ['oxydants', 'reducers', 'pm2_5', 'pm10'];
+    const customerId = req.query.customerId;
+    if (!customerId) {
+        return res.status(400).json({message: 'Missing parameter'});
+    }
+    if (res.tokenId != customerId) {
+        return res.status(404).json({message: 'You have no right of access to this ressource'})
+    }
+    try {
+        const customer = await Customers.findOne({ include: ["Roles", "Companies"], where: { id: customerId } })
+        if (customer == null) {
+            return res.status(404).json({ message: `Customer not found.` });
+        } else {
+                let parks = await Parks.findAll({ include: ["Sensors", "Buildings"], where: { company_id : customer.companies_id } });
+                let sensors = []
+                for(let park of parks) {
+                    for (let sensor of park.Sensors) {
+                        if (!sensors.includes(sensor)) {
+                            sensors.push(sensor);
+                        } 
+                    }
+                }
+                let sensorsAqiHistory = []
+                for (let sensor of sensors) {
+                    let sensorHistories = await SensorHistory.findAll({
+                        where: {
+                            sensors_id: sensor.id,
+                        },
+                        order: [
+                            ['createdAt', 'DESC']
+                        ],
+                        limit: 7
+                    })
+                    let sensorAqiHistory = [];
+                    for (let sensorHistory in sensorHistories) {
+                        let aqis = {}
+                        for (const polluant of polluants) {
+                            aqis[polluant] = calculateAqi(sensorHistories[sensorHistory][polluant], polluant);
+                        }
+                        let finalAqi = 0;
+                        for(let aqi in aqis) {
+                            if (finalAqi < aqis[aqi]) {
+                                finalAqi = aqis[aqi]
+                            }
+                        }
+                        sensorAqiHistory.push(finalAqi);
+                    }
+                    if (sensorAqiHistory.length != 0) {
+                        sensorsAqiHistory.push(sensorAqiHistory);
+                    }
+                }
+                if (sensorsAqiHistory.length > 0) {
+                    let aqisAverage = [];
+                    for (i = 0; i < sensorsAqiHistory[0].length; i++) {
+                        let numbersOfArrays = sensorsAqiHistory.length;
+                        let aqiSum = 0;
+                        for (j = 0; j < numbersOfArrays; j++) {
+                            aqiSum = aqiSum + sensorsAqiHistory[j][i];
+                        }
+                        let aqiAverage = aqiSum / numbersOfArrays;
+                        aqisAverage.push(parseInt(aqiAverage))
+                    }
+                    return res.status(200).json(aqisAverage);
+                }
+                return res.status(404).json({message: "No Data Found"});
+        }
+    }catch (err) {
+        console.log(err);
+        return res.status(500).json({ message: 'Database Error', error: err })
+    }
+    
+}
+
 
 exports.createFakeData = async (req, res) => {
     try {
@@ -293,7 +369,6 @@ exports.getLeastAndMaxPolluant = async (req, res) => {
 
 
 exports.insertData = async (req, res) => {
-   
     console.log(req.body)
     console.log(req.body.mac_address)
     if (!req.body) {
