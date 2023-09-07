@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     siret: DataTypes.STRING,
     siren: DataTypes.STRING,
     kbis: DataTypes.STRING,
+    owner : DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Companies',
