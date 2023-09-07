@@ -1,6 +1,7 @@
 const db = require('./../models/index');
 const { Op } = require("sequelize");
 const Park = db['Parks'];
+const Sensors = db['Sensors']
 
 exports.getAllParks = (req, res) => {
     Park.findAll({
@@ -84,6 +85,11 @@ exports.updatePark = async (req, res) => {
             park.building_id = req.body.building_id ?? park.building_id;
             park.company_id = req.body.company_id ?? park.company_id;
             await park.save();
+            park.sensors = JSON.parse(req.body.sensors) ?? park.sensors;
+            if (park.sensors.lenght >0){
+            park.sensors.forEach(async function (sensor) {
+                await Sensors.update({parks_id : park.id}, { where: {id: sensor} })
+            })}
             return res.json({ message: 'Park Updated', data: { park } })
         }
         // await Park.update(req.body, { where: {id: parkId} })
