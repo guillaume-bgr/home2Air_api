@@ -13,6 +13,7 @@ module.exports = (app) => {
         router.post('/aqi', SensorController.calculateAqi);
         router.post('/fake-data', SensorController.createFakeData);
         router.get('/:id/data-over-time', authToken, SensorController.getDataOverTime);
+        router.get('/:id/data', authToken, SensorController.getData);
         router.post('/insert-data', SensorController.insertData);
         router.get('/aqi/average', authToken, SensorController.getCustomerSensorsAverageAqi);
     });

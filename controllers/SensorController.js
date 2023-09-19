@@ -143,6 +143,33 @@ exports.getDataOverTime = async (req, res) => {
     }
 }
 
+exports.getData = async (req, res) => {
+    let sensorId = parseInt(req.params.id)
+
+    if (!sensorId) {
+        return res.status(400).json({ message: 'Missing parameter' })
+    }
+    try {
+        let sensor = await Sensors.findOne({ where: {id: sensorId} });
+        if (sensor === null) {
+            return res.status(404).json({ message: 'This sensor does not exist !' })
+        }
+        let customer = await Customers.findOne({ where: {id: res.tokenId} })
+        if (customer.companies_id != sensor.companies_id) {
+            return res.status(403).json({ message: 'Forbidden'})
+        }
+        SensorHistory.findAll({
+            where: {
+                sensors_id: sensorId,
+            }
+        }).then((sensorHistories) => {
+            res.json(sensorHistories);
+        })
+    } catch(err) {
+        return res.status(500).json({ message: 'Database Error', error: err.message })
+    }
+}
+
 exports.getAvgSensorHistory = async (req, res) => {
     let sensorId = parseInt(req.params.id)
     // Vérification si le champ id est présent et cohérent
